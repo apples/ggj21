@@ -1,0 +1,24 @@
+[submodule "ext/sushi"]
+	path = ext/sushi
+	url = https://github.com/apples/sushi
+[submodule "ext/ginseng"]
+	path = ext/ginseng
+	url = https://github.com/apples/ginseng
+[submodule "ext/glm"]
+	path = ext/glm
+	url = https://github.com/g-truc/glm
+[submodule "ext/box2d"]
+	path = ext/box2d
+	url = https://github.com/erincatto/box2d
+[submodule "ext/freetype2"]
+	path = ext/freetype2
+	url = git://git.sv.nongnu.org/freetype/freetype2.git
+[submodule "ext/trellis"]
+	path = ext/trellis
+	url = https://github.com/apples/trellis
+[submodule "ext/asio"]
+	path = ext/asio
+	url = https://github.com/chriskohlhoff/asio
+[submodule "ext/cereal"]
+	path = ext/cereal
+	url = https://github.com/USCiLab/cereal
