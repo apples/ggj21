@@ -21,15 +21,6 @@ void print_exception(const std::exception& e, int level = 0) {
     }
 }
 
-std::function<void()> loop;
-void main_loop() try {
-    loop();
-} catch (const std::exception& e) {
-    std::cerr << "Fatal exception:" << std::endl;
-    print_exception(e, 1);
-    std::terminate();
-}
-
 int main(int argc, char* argv[]) try {
     SDL_SetMainReady();
 
@@ -55,16 +46,22 @@ int main(int argc, char* argv[]) try {
         io.run();
     });
 
-    auto engine = std::make_unique<ember::engine>(config);
+    auto engine = std::make_unique<ember::engine>(io, config);
 
-    engine->queue_transition<scene_mainmenu>();
+    engine->queue_transition<scene_mainmenu>(false);
 
     std::cout << "Success." << std::endl;
+    
+    std::cout << "Running main loop..." << std::endl;
 
-    loop = [&engine]{ engine->tick(); };
-
-    while (!engine->get_should_quit()) {
-        main_loop();
+    try {
+        while (!engine->get_should_quit()) {
+            engine->tick();
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Fatal exception:" << std::endl;
+        print_exception(e, 1);
+        std::terminate();
     }
 
     io.stop();

@@ -10,7 +10,7 @@
 
 namespace ember {
 
-engine::engine(const config::config& config) : should_quit(false) {
+engine::engine(asio::io_context& io, const config::config& config) : io(&io), should_quit(false) {
     std::clog << "Constructing engine..." << std::endl;
 
     // Initialize Lua

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "json_serializers.hpp"
-
 #include <sol.hpp>
 
 #include <tuple>
@@ -11,9 +9,6 @@
 #endif
 
 namespace component {
-
-using ember::json_serializers::basic::from_json;
-using ember::json_serializers::basic::to_json;
 
 void register_all_components(sol::table& table);
 

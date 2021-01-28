@@ -1,5 +1,8 @@
 #include "scene_mainmenu.hpp"
 
+#include "scene_gameplay.hpp"
+#include "server.hpp"
+
 #include "ember/engine.hpp"
 #include "ember/vdom.hpp"
 
@@ -23,5 +26,9 @@ auto scene_mainmenu::render_gui() -> sol::table {
 }
 
 void scene_mainmenu::start_game() {
-    //engine->queue_transition<scene_gameplay>();
+    auto server = std::make_shared<game_server>(*engine->io, 6969);
+    server->start();
+    std::cout << "Server started: " << server->get_endpoint() << std::endl;
+    auto server_addr = asio::ip::udp::endpoint{asio::ip::make_address_v6("::1"), server->get_endpoint().port()};
+    engine->queue_transition<scene_gameplay>(false, server, server_addr);
 }

@@ -14,6 +14,8 @@
 #include <string>
 #include <memory>
 
+#include "ember/reflection.hpp"
+
 #define EMBER_REFLECTION_ENABLE_REGISTRY
 #include "ember/reflection_start.hpp"
 

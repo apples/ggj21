@@ -1,16 +1,12 @@
 #pragma once
 
-#include "json.hpp"
-#include "json_serializers.hpp"
-
 #include <string>
+
+#include "reflection.hpp"
 
 #include "reflection_start.hpp"
 
 namespace ember::config {
-
-using json_serializers::basic::from_json;
-using json_serializers::basic::to_json;
 
 struct display_t {
     int width;

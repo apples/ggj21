@@ -9,6 +9,7 @@
 #include "scene.hpp"
 #include "shaders.hpp"
 
+#include <asio.hpp>
 #include <sol.hpp>
 #include <sushi/sushi.hpp>
 
@@ -24,7 +25,7 @@ class engine {
 public:
     using clock = std::chrono::steady_clock;
 
-    engine(const config::config& config);
+    engine(asio::io_context& io, const config::config& config);
     engine(const engine&) = delete;
     engine(engine&&) = delete;
     engine& operator=(const engine&) = delete;
@@ -42,9 +43,10 @@ public:
     auto call_script(const std::string& module_name, const std::string& function_name, Ts&&... args)
         -> sol::function_result;
 
-    template <typename T, typename = std::enable_if_t<std::is_base_of_v<scene, T>>>
-    void queue_transition(bool force = false);
+    template <typename T, typename... Args, typename = std::enable_if_t<std::is_base_of_v<scene, T>>>
+    void queue_transition(bool force, Args&&... args);
 
+    asio::io_context* io;
     sol::state lua;
     display_info display;
     resource_cache<sushi::mesh_group, std::string> mesh_cache;
@@ -109,11 +111,11 @@ auto engine::call_script(const std::string& module_name, const std::string& func
     }
 }
 
-template <typename T, typename>
-void engine::queue_transition(bool force) {
+template <typename T, typename... Args, typename>
+void engine::queue_transition(bool force, Args&&... args) {
     if (!queued_transition || !queued_transition->force) {
         queued_transition = transition{
-            [](engine& eng, scene* prev){ return std::make_shared<T>(eng, prev); },
+            [=](engine& eng, scene* prev) { return std::make_shared<T>(eng, prev, args...); },
             force
         };
     }
