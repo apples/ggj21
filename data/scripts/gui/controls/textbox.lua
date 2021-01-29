@@ -8,6 +8,9 @@ function pick(src, ...)
     return rv
 end
 
+-- 'height', 'width', 'left', 'right', 'bottom', 'top', 'halign', 'valign'
+-- value: string
+-- on_change: (string) => ()
 return function(props)
     local panelprops = pick(props, 'height', 'width', 'left', 'right', 'bottom', 'top', 'halign', 'valign')
 

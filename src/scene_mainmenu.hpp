@@ -16,6 +16,7 @@ public:
 
 private:
     void start_game();
+    void join_game(const std::string& addr_str);
 
     sol::table gui_state;
 };

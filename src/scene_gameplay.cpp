@@ -65,25 +65,31 @@ void scene_gameplay::tick(float delta) {
 }
 
 void scene_gameplay::render() {
-    auto proj = get_proj(camera);
-    auto view = get_view(camera);
-    auto model = glm::mat4(1);
-
     const auto& state = context.get_state();
 
     if (state.me) {
         const auto& me = state.players[*state.me];
-        model = glm::translate(model, glm::vec3{me.position, 0});
+        camera.pos = -glm::vec3{me.position, 0};
     }
 
-    sprite_shader.bind();
-    sprite_shader.set_MVP(proj * view * model);
-    sprite_shader.set_s_texture(0);
-    sprite_shader.set_tint({1, 1, 1, 1});
-    sprite_shader.set_uvmat(glm::mat3(1));
+    auto proj = get_proj(camera);
+    auto view = get_view(camera);
 
-    sushi::set_texture(0, player_sprite);
-    sushi::draw_mesh(sprite_mesh);
+    for (int i = 0; i < state.players.size(); ++i) {
+        auto& p = state.players[i];
+        if (p.present) {
+            auto model = glm::translate(glm::mat4(1), glm::vec3{p.position, 0});
+
+            sprite_shader.bind();
+            sprite_shader.set_MVP(proj * view * model);
+            sprite_shader.set_s_texture(0);
+            sprite_shader.set_tint({1, 1, 1, 1});
+            sprite_shader.set_uvmat(glm::mat3(1));
+
+            sushi::set_texture(0, player_sprite);
+            sushi::draw_mesh(sprite_mesh);
+        }
+    }
 }
 
 auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
