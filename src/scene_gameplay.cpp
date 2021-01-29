@@ -15,7 +15,9 @@ scene_gameplay::scene_gameplay(
       context(*engine.io, server_addr),
       sprite_shader("data/shaders/sprite.vert", "data/shaders/sprite.frag"),
       sprite_mesh(),
-      player_sprite(sushi::load_texture_2d("data/textures/ninji.png", false, false, false, false)) {
+      background_mesh(),
+      player_sprite(sushi::load_texture_2d("data/textures/ninji.png", false, false, false, false)),
+      background_shader("data/shaders/sprite.vert", "data/shaders/background1.frag") {
 
     // build sprite mesh
     {
@@ -34,6 +36,25 @@ scene_gameplay::scene_gameplay(
         mb.tri(br, bl, ul);
 
         sprite_mesh = mb.get();
+    }
+
+    // build background mesh
+    {
+        auto mb = sushi::mesh_group_builder();
+        mb.enable(sushi::attrib_location::POSITION);
+        mb.enable(sushi::attrib_location::TEXCOORD);
+
+        mb.mesh("background");
+
+        auto ul = mb.vertex().position({-10, 10, 0}).texcoord({0, 0}).get();
+        auto ur = mb.vertex().position({10, 10, 0}).texcoord({1, 0}).get();
+        auto bl = mb.vertex().position({-10, -10, 0}).texcoord({0, 1}).get();
+        auto br = mb.vertex().position({10, -10, 0}).texcoord({1, 1}).get();
+
+        mb.tri(ul, ur, br);
+        mb.tri(br, bl, ul);
+
+        background_mesh = mb.get();
     }
 
     // set up camera
@@ -84,6 +105,14 @@ void scene_gameplay::render() {
 
     sushi::set_texture(0, player_sprite);
     sushi::draw_mesh(sprite_mesh);
+    
+    background_shader.bind();
+    background_shader.set_MVP(proj * view * model);
+    background_shader.set_uvmat(glm::mat3(1)); //move out
+    //background_shader.set_resolution();
+    background_shader.set_time(state.time);
+
+    sushi::draw_mesh(background_mesh);
 }
 
 auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
