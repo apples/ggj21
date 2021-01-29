@@ -1,6 +1,7 @@
 #include "scene_gameplay.hpp"
 
 #include "ember/engine.hpp"
+#include "ember/utility.hpp"
 #include "ember/vdom.hpp"
 
 scene_gameplay::scene_gameplay(
@@ -11,12 +12,11 @@ scene_gameplay::scene_gameplay(
     : scene(engine),
       gui_state{engine.lua.create_table()},
       server_handle(server_handle),
-      server_addr(server_addr),
-      context(*engine.io),
+      context(*engine.io, server_addr),
       sprite_shader("data/shaders/sprite.vert", "data/shaders/sprite.frag"),
       sprite_mesh(),
       player_sprite(sushi::load_texture_2d("data/textures/ninji.png", false, false, false, false)) {
-    
+
     // build sprite mesh
     {
         auto mb = sushi::mesh_group_builder();
@@ -44,17 +44,37 @@ scene_gameplay::scene_gameplay(
 }
 
 void scene_gameplay::init() {
-    context.connect({asio::ip::udp::v6(), 0}, server_addr);
+    context.start();
 }
 
 void scene_gameplay::tick(float delta) {
-    context.poll_events(*this);
+    const auto& state = context.get_state();
+
+    auto input_dir = glm::vec2{0, 0};
+
+    if (state.me) {
+        auto keys = SDL_GetKeyboardState(nullptr);
+
+        input_dir.x -= int(bool(keys[SDL_Scancode::SDL_SCANCODE_A]));
+        input_dir.x += int(bool(keys[SDL_Scancode::SDL_SCANCODE_D]));
+        input_dir.y -= int(bool(keys[SDL_Scancode::SDL_SCANCODE_S]));
+        input_dir.y += int(bool(keys[SDL_Scancode::SDL_SCANCODE_W]));
+    }
+
+    context.tick(delta, input_dir);
 }
 
 void scene_gameplay::render() {
     auto proj = get_proj(camera);
     auto view = get_view(camera);
     auto model = glm::mat4(1);
+
+    const auto& state = context.get_state();
+
+    if (state.me) {
+        const auto& me = state.players[*state.me];
+        model = glm::translate(model, glm::vec3{me.position, 0});
+    }
 
     sprite_shader.bind();
     sprite_shader.set_MVP(proj * view * model);
@@ -72,16 +92,4 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
 
 auto scene_gameplay::render_gui() -> sol::table {
     return ember::vdom::create_element(engine->lua, "gui.scene_gameplay.root", gui_state, engine->lua.create_table());
-}
-
-void scene_gameplay::on_connect(const connection_ptr& conn) {
-    std::cout << "Connected." << std::endl;
-}
-
-void scene_gameplay::on_disconnect(const connection_ptr& conn, asio::error_code ec) {
-    std::cout << "Disconnected. Reason: " << ec.category().name() << ": " << ec.message() << std::endl;
-}
-
-void scene_gameplay::on_receive(channel::derp, const connection_ptr& conn, std::istream& data) {
-
 }

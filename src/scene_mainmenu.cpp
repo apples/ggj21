@@ -26,7 +26,7 @@ auto scene_mainmenu::render_gui() -> sol::table {
 }
 
 void scene_mainmenu::start_game() {
-    auto server = std::make_shared<game_server>(*engine->io, 6969);
+    auto server = std::make_shared<server::game_server>(*engine->io, 6969);
     server->start();
     std::cout << "Server started: " << server->get_endpoint() << std::endl;
     auto server_addr = asio::ip::udp::endpoint{asio::ip::make_address_v6("::1"), server->get_endpoint().port()};
