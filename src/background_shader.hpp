@@ -12,13 +12,15 @@ public:
     background_shader_program(const std::string& vert, const std::string& frag);
 
     void set_MVP(const glm::mat4& mat);
-    void set_uvmat(const glm::mat3& mat);
-    void set_time(const int time);
+    void set_modelmat(const glm::mat4& mat);
+    void set_time(int time);
+    void set_worldsize(const glm::vec2& worldsize);
 
 private:
     struct {
         GLint MVP;
-        GLint uvmat;
+        GLint modelmat;
         GLint time;
+        GLint worldsize;
     } uniforms;
 };

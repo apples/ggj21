@@ -119,7 +119,7 @@ void game_server::on_receive(channel::state_updates, const connection_ptr& conn,
             std::visit(ember::utility::overload {
                 [&](const message::player_move& m) {
                     player.velocity = m.input * 10.f;
-                    player.position += player.velocity * (1.f / 60.f) * float(current_state.time - m.time);
+                    //player.position += player.velocity * (1.f / 60.f) * float(current_state.time - m.time);
                 },
                 [&](const auto&) {
                     std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;

@@ -9,18 +9,23 @@ background_shader_program::background_shader_program(const std::string& vert, co
     bind();
 
     uniforms.MVP = get_uniform_location("MVP");
-    uniforms.uvmat = get_uniform_location("TexCoordMat");
-    uniforms.time = get_uniform_location("time");
+    uniforms.modelmat = get_uniform_location("ModelMat");
+    uniforms.time = get_uniform_location("Time");
+    uniforms.worldsize = get_uniform_location("WorldSize");
 }
 
 void background_shader_program::set_MVP(const glm::mat4& mat) {
     sushi::set_current_program_uniform(uniforms.MVP, mat);
 }
 
-void background_shader_program::set_uvmat(const glm::mat3& mat) {
-    sushi::set_current_program_uniform(uniforms.uvmat, mat);
+void background_shader_program::set_modelmat(const glm::mat4& mat) {
+    sushi::set_current_program_uniform(uniforms.modelmat, mat);
 }
 
-void background_shader_program::set_time(const int time) {
+void background_shader_program::set_time(int time) {
     sushi::set_current_program_uniform(uniforms.time, time);
+}
+
+void background_shader_program::set_worldsize(const glm::vec2& worldsize) {
+    sushi::set_current_program_uniform(uniforms.worldsize, worldsize);
 }

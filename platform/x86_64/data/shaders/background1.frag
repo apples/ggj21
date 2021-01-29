@@ -1,8 +1,9 @@
 #version 400
 
-in vec2 texcoord;
+in vec3 worldCoord;
 
-uniform int time;
+uniform int Time;
+uniform vec2 WorldSize;
 
 layout(location = 0) out vec4 outColor;
 
@@ -43,9 +44,9 @@ float simplex3d(vec3 p) {
 	 vec3 x3 = x - 1.0 + 3.0*G3;
 	 
 	 /* 2. find four surflets and store them in d */
-	 vec4 w, d;
 	 
 	 /* calculate surflet weights */
+	 vec4 w;
 	 w.x = dot(x, x);
 	 w.y = dot(x1, x1);
 	 w.z = dot(x2, x2);
@@ -55,14 +56,14 @@ float simplex3d(vec3 p) {
 	 w = max(0.6 - w, 0.0);
 	 
 	 /* calculate surflet components */
+	 vec4 d;
 	 d.x = dot(random3(s), x);
 	 d.y = dot(random3(s + i1), x1);
 	 d.z = dot(random3(s + i2), x2);
 	 d.w = dot(random3(s + 1.0), x3);
 	 
 	 /* multiply d by w^4 */
-	 w *= w;
-	 w *= w;
+	 w = w * w * w;
 	 d *= w;
 	 
 	 /* 3. return the sum of the four surflets */
@@ -76,29 +77,28 @@ const mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);
 
 /* directional artifacts can be reduced by rotating each octave */
 float simplex3d_fractal(vec3 m) {
-    return   0.5333333*simplex3d(m*rot1)
-			+0.2666667*simplex3d(2.0*m*rot2);
-			//+0.1333333*simplex3d(4.0*m*rot3)
-			//+0.0666667*simplex3d(8.0*m);
+    return	0.5333333*simplex3d(m * rot1)
+			+ 0.2666667*simplex3d(2.0 * m * rot2);
+			+ 0.1333333*simplex3d(4.0 * m * rot3)
+			+ 0.0666667*simplex3d(8.0 * m);
 }
 
-void main()// out vec4 fragColor, in vec2 fragCoord )
-{
-	vec2 p = texcoord;// / iResolution.x;
-	vec3 p3 = vec3(p, (time*0.01)/60);//p
-	
-	float value;
-	
-	if (true){//(p.x <= 0.5) {
-		value = simplex3d(p3*10.0); //8 is probably a good fit for the player view, map view probably closer to 12
-		//value = simplex3d_fractal(p3*16.0);
+void main() {
+	if (worldCoord.x < 0 || worldCoord.y < 0 || worldCoord.x > WorldSize.x || worldCoord.y > WorldSize.y) {
+		outColor = vec4(0.5, 0.5, 0.5, 1);
+		return;
 	}
-	
-	value = round(0.5 + 0.5*value);
-	//value *= smoothstep(0.0, 0.005, abs(0.5-p.x)); // hello, iq :)
-	
-	outColor = vec4(
-			vec3(value),
-			1.0);
-	return;
+
+	float scale = 0.1; // 8 is probably a good fit for the player view, map view probably closer to 12
+	float timeScale = 1.0 / 600.0;
+
+	vec3 coord = vec3(worldCoord.xy * scale, Time * timeScale);
+
+	float value = simplex3d_fractal(coord) * 0.5 + 0.5;
+
+	float f = fwidth(value);
+
+	value = smoothstep(0.5 - f, 0.5, value);
+
+	outColor = vec4(vec3(value), 1.0);
 }

@@ -27,34 +27,15 @@ scene_gameplay::scene_gameplay(
 
         mb.mesh("sprite");
 
-        auto ul = mb.vertex().position({-1, 1, 0}).texcoord({0, 0}).get();
-        auto ur = mb.vertex().position({1, 1, 0}).texcoord({1, 0}).get();
-        auto bl = mb.vertex().position({-1, -1, 0}).texcoord({0, 1}).get();
-        auto br = mb.vertex().position({1, -1, 0}).texcoord({1, 1}).get();
+        auto ul = mb.vertex().position({-0.5, 0.5, 0}).texcoord({0, 0}).get();
+        auto ur = mb.vertex().position({0.5, 0.5, 0}).texcoord({1, 0}).get();
+        auto bl = mb.vertex().position({-0.5, -0.5, 0}).texcoord({0, 1}).get();
+        auto br = mb.vertex().position({0.5, -0.5, 0}).texcoord({1, 1}).get();
 
         mb.tri(ul, ur, br);
         mb.tri(br, bl, ul);
 
         sprite_mesh = mb.get();
-    }
-
-    // build background mesh
-    {
-        auto mb = sushi::mesh_group_builder();
-        mb.enable(sushi::attrib_location::POSITION);
-        mb.enable(sushi::attrib_location::TEXCOORD);
-
-        mb.mesh("background");
-
-        auto ul = mb.vertex().position({-10, 10, 0}).texcoord({0, 0}).get();
-        auto ur = mb.vertex().position({10, 10, 0}).texcoord({1, 0}).get();
-        auto bl = mb.vertex().position({-10, -10, 0}).texcoord({0, 1}).get();
-        auto br = mb.vertex().position({10, -10, 0}).texcoord({1, 1}).get();
-
-        mb.tri(ul, ur, br);
-        mb.tri(br, bl, ul);
-
-        background_mesh = mb.get();
     }
 
     // set up camera
@@ -95,6 +76,7 @@ void scene_gameplay::render() {
 
     auto proj = get_proj(camera);
     auto view = get_view(camera);
+    auto projview = proj * view;
 
     for (int i = 0; i < state.players.size(); ++i) {
         auto& p = state.players[i];
@@ -102,7 +84,7 @@ void scene_gameplay::render() {
             auto model = glm::translate(glm::mat4(1), glm::vec3{p.position, 0});
 
             sprite_shader.bind();
-            sprite_shader.set_MVP(proj * view * model);
+            sprite_shader.set_MVP(projview * model);
             sprite_shader.set_s_texture(0);
             sprite_shader.set_tint({1, 1, 1, 1});
             sprite_shader.set_uvmat(glm::mat3(1));
@@ -112,13 +94,19 @@ void scene_gameplay::render() {
         }
     }
     
-    background_shader.bind();
-    background_shader.set_MVP(proj * view);
-    background_shader.set_uvmat(glm::mat3(1)); //move out
-    //background_shader.set_resolution();
-    background_shader.set_time(state.time);
+    {
+        auto model = glm::mat4(1);
+        model = glm::translate(model, -camera.pos);
+        model = glm::scale(model, glm::vec3{camera.height * camera.aspect_ratio, camera.height, 1});
 
-    sushi::draw_mesh(background_mesh);
+        background_shader.bind();
+        background_shader.set_MVP(projview * model);
+        background_shader.set_modelmat(model);
+        background_shader.set_time(state.time);
+        background_shader.set_worldsize({100, 100});
+
+        sushi::draw_mesh(sprite_mesh);
+    }
 }
 
 auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {

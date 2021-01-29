@@ -53,13 +53,10 @@ engine::engine(asio::io_context& io, const config::config& config) : io(&io), sh
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-#ifdef __EMSCRIPTEN__
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#else
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-#endif
+
     // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     window = SDL_CreateWindow(
@@ -68,17 +65,19 @@ engine::engine(asio::io_context& io, const config::config& config) : io(&io), sh
         SDL_WINDOWPOS_CENTERED,
         display.width,
         display.height,
-        SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+        SDL_WINDOW_OPENGL);
 
     glcontext = SDL_GL_CreateContext(window);
 
-#ifdef __EMSCRIPTEN__
-#else
+    // Try to enable adaptive sync, otherwise enable plain vsync.
+    if (SDL_GL_SetSwapInterval(-1) == -1) {
+        SDL_GL_SetSwapInterval(1);
+    }
+
     if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
         std::cerr << "Failed to load GL extensions" << std::endl;
         throw std::runtime_error("Failed to load GL extensions");
     }
-#endif
 
     SDL_StartTextInput();
 
