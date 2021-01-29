@@ -66,6 +66,7 @@ void game_server::tick(float delta) {
         for (auto i = 0u; i < 4; ++i) {
             if (current_state.players[i].conn) {
                 update.players[i].present = true;
+                update.players[i].team = current_state.players[i].team;
                 update.players[i].position = current_state.players[i].position;
                 update.players[i].velocity = current_state.players[i].velocity;
             } else {

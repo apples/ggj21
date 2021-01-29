@@ -15,6 +15,7 @@ public:
     void set_uvmat(const glm::mat3& mat);
     void set_s_texture(GLint i);
     void set_tint(const glm::vec4& v);
+    void set_invert(bool invert);
 
 private:
     struct {
@@ -22,5 +23,6 @@ private:
         GLint uvmat;
         GLint s_texture;
         GLint tint;
+        GLint invert;
     } uniforms;
 };

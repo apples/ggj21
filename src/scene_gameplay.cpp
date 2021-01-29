@@ -69,9 +69,11 @@ void scene_gameplay::tick(float delta) {
 void scene_gameplay::render() {
     const auto& state = context.get_state();
 
+    auto me = (const client::player_info*)nullptr;
+
     if (state.me) {
-        const auto& me = state.players[*state.me];
-        camera.pos = -glm::vec3{me.position, 0};
+        me = &state.players[*state.me];
+        camera.pos = -glm::vec3{me->position, 0};
     }
 
     auto proj = get_proj(camera);
@@ -86,8 +88,15 @@ void scene_gameplay::render() {
             sprite_shader.bind();
             sprite_shader.set_MVP(projview * model);
             sprite_shader.set_s_texture(0);
-            sprite_shader.set_tint({1, 1, 1, 1});
             sprite_shader.set_uvmat(glm::mat3(1));
+
+            if (me && me->team == p.team) {
+                sprite_shader.set_tint({1, 1, 1, 1});
+                sprite_shader.set_invert(p.team == team_name::BLACK);
+            } else {
+                sprite_shader.set_tint({0, 0, 0, 0});
+                sprite_shader.set_invert(p.team == team_name::WHITE);
+            }
 
             sushi::set_texture(0, player_sprite);
             sushi::draw_mesh(sprite_mesh);

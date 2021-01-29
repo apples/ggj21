@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.hpp"
+
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/variant.hpp>
@@ -11,12 +13,14 @@ namespace message {
 struct game_state_update {
     struct player_info {
         bool present = false;
+        team_name team = team_name::BLACK;
         glm::vec2 position = {0, 0};
         glm::vec2 velocity = {0, 0};
 
         template <typename Archive>
         void serialize(Archive& archive) {
             archive(present);
+            archive(team);
             archive(position.x, position.y);
             archive(velocity.x, velocity.y);
         }
