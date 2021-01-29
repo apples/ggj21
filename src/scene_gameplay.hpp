@@ -9,6 +9,7 @@
 #include <sol.hpp>
 
 #include "sprite_shader.hpp"
+#include "background_shader.hpp"
 
 class scene_gameplay final : public ember::scene {
 public:
@@ -28,6 +29,9 @@ private:
     sprite_shader_program sprite_shader;
     sushi::mesh_group sprite_mesh;
     sushi::texture_2d player_sprite;
+    background_shader_program background_shader;
+    sushi::mesh_group background_mesh;
+
 
     ember::camera::orthographic camera;
 };
