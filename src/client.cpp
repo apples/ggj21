@@ -13,6 +13,10 @@ game_client::~game_client() {
     stop();
 }
 
+auto game_client::get_state() -> const game_state& {
+    return predicted_state;
+}
+
 void game_client::start() {
     context.connect({asio::ip::udp::v6(), 0}, server_addr);
 }
@@ -22,14 +26,23 @@ void game_client::stop() {
 }
 
 void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir) {
-    context.poll_events(*this);
-
     if (connection && current_state.me) {
         auto msg = message::player_move{};
-        msg.time = current_state.time;
+        msg.time = predicted_state.time;
         msg.input = input_dir;
         send_message<channel::state_updates>(connection, msg);
     }
+
+    predicted_state.time += delta * 60.0;
+    
+    // physics
+    for (auto& player : predicted_state.players) {
+        if (player.present) {
+            player.position += player.velocity * delta;
+        }
+    }
+
+    context.poll_events(*this);
 }
 
 void game_client::on_connect(const connection_ptr& conn) {
@@ -59,6 +72,7 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
                 }
             }
             current_state.me = m.me;
+            predicted_state = current_state;
         },
         [&](const auto&) {
             std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;

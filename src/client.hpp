@@ -21,7 +21,7 @@ struct player_info {
 };
 
 struct game_state {
-    int time = 0;
+    double time = 0;
     std::array<player_info, 4> players;
     std::optional<int> me = std::nullopt;
 };
@@ -32,9 +32,7 @@ public:
 
     ~game_client();
 
-    auto get_state() -> const game_state& {
-        return current_state;
-    }
+    auto get_state() -> const game_state&;
 
     void start();
 
@@ -51,6 +49,7 @@ private:
     asio::ip::udp::endpoint server_addr;
 
     game_state current_state;
+    game_state predicted_state;
     connection_ptr connection;
 };
 

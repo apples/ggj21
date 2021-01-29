@@ -32,6 +32,5 @@ private:
     background_shader_program background_shader;
     sushi::mesh_group background_mesh;
 
-
     ember::camera::orthographic camera;
 };
