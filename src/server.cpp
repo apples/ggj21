@@ -133,6 +133,14 @@ void game_server::on_receive(channel::state_updates, const connection_ptr& conn,
                     player.velocity = m.input * 10.f;
                     //player.position += player.velocity * (1.f / 60.f) * float(current_state.time - m.time);
                 },
+                [&](const message::player_fire& m) {
+                    auto newKunai = server::kunai_info();
+                    newKunai.active = true;
+                    newKunai.direction = m.direction;
+                    newKunai.position = player.position;
+                    newKunai.velocity = m.direction * 5.0f;
+                    current_state.projectiles[0] = newKunai;
+                },
                 [&](const auto&) {
                     std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;
                     conn->disconnect();

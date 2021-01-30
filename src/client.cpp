@@ -25,12 +25,15 @@ void game_client::stop() {
     context.stop();
 }
 
-void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir) {
+void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir, const glm::vec2& direction) {
     if (connection && current_state.me) {
         auto msg = message::player_move{};
         msg.time = predicted_state.time;
         msg.input = input_dir;
+        msg.direction = direction;
         send_message<channel::state_updates>(connection, msg);
+
+        //auto fireMsg = message::
     }
 
     predicted_state.time += delta * 60.0;
@@ -49,6 +52,12 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir)
     }
 
     context.poll_events(*this);
+}
+
+void game_client::fire(const glm::vec2& direction) {
+    auto msg = message::player_fire{};
+    msg.direction = direction;
+    send_message<channel::state_updates>(connection, msg);
 }
 
 void game_client::on_connect(const connection_ptr& conn) {
