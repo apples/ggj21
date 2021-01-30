@@ -42,6 +42,12 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir)
         }
     }
 
+    for (auto& kunai : predicted_state.projectiles) {
+        if (kunai.active) {
+            kunai.position += kunai.velocity * delta;
+        }
+    }
+
     context.poll_events(*this);
 }
 

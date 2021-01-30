@@ -57,6 +57,12 @@ void game_server::tick(float delta) {
         }
     }
 
+    for (auto& kunai : current_state.projectiles) {
+        if (kunai.active) {
+            kunai.position += kunai.velocity * delta;
+        }
+    }
+
     // send state to clients
     {
         auto update = message::game_state_update{};
@@ -72,6 +78,11 @@ void game_server::tick(float delta) {
             } else {
                 update.players[i].present = false;
             }
+        }
+
+        for(int i = 0; i < current_state.projectiles.size(); i++) {
+            update.projectiles[i].position = current_state.projectiles[i].position;
+            update.projectiles[i].velocity = current_state.projectiles[i].velocity;
         }
 
         for (auto i = 0u; i < current_state.players.size(); ++i) {

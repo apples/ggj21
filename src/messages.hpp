@@ -26,8 +26,16 @@ struct game_state_update {
         }
     };
 
+    struct kunai_info {
+        bool active = false;
+        team_name team = team_name::BLACK;
+        glm::vec2 position = {0, 0};
+        glm::vec2 velocity = {0, 0};
+    };
+
     int time = 0;
     std::array<player_info, 4> players = {};
+    std::array<kunai_info, 4> projectiles = {};//4 is arbitrary here, change
     int me = 0;
 
     template <typename Archive>
