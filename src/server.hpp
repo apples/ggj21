@@ -34,6 +34,22 @@ struct game_state {
     std::array<kunai_info, 8> projectiles;
 };
 
+class game_server_scene {
+public:
+    game_server_scene();
+
+    virtual ~game_server_scene() = 0;
+
+    virtual void tick(float delta) = 0;
+
+    virtual void on_connect(const connection_ptr& conn) = 0;
+    virtual void on_disconnect(const connection_ptr& conn, asio::error_code ec) = 0;
+    virtual void on_receive(channel::state_updates, const connection_ptr& conn, std::istream& data) = 0;
+    virtual void on_receive(channel::actions, const connection_ptr& conn, std::istream& data) = 0;
+};
+
+inline game_server_scene::~game_server_scene() = default;
+
 class game_server {
 public:
     game_server(asio::io_context& io, std::uint16_t port);
@@ -48,11 +64,6 @@ public:
 
     void stop();
 
-    void on_connect(const connection_ptr& conn);
-    void on_disconnect(const connection_ptr& conn, asio::error_code ec);
-    void on_receive(channel::state_updates, const connection_ptr& conn, std::istream& data);
-    void on_receive(channel::actions, const connection_ptr& conn, std::istream& data);
-
 private:
     void schedule_tick();
 
@@ -65,7 +76,7 @@ private:
     asio::steady_timer::duration tick_interval;
     std::shared_ptr<void> timer_guard;
 
-    game_state current_state;
+    std::shared_ptr<game_server_scene> scene;
 };
 
 } // namespace server
