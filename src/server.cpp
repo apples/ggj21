@@ -57,6 +57,12 @@ void game_server::tick(float delta) {
         }
     }
 
+    for (auto& kunai : current_state.projectiles) {
+        if (kunai.active) {
+            kunai.position += kunai.velocity * delta;
+        }
+    }
+
     // send state to clients
     {
         auto update = message::game_state_update{};
@@ -72,6 +78,11 @@ void game_server::tick(float delta) {
             } else {
                 update.players[i].present = false;
             }
+        }
+
+        for(int i = 0; i < current_state.projectiles.size(); i++) {
+            update.projectiles[i].position = current_state.projectiles[i].position;
+            update.projectiles[i].velocity = current_state.projectiles[i].velocity;
         }
 
         for (auto i = 0u; i < current_state.players.size(); ++i) {
@@ -121,6 +132,14 @@ void game_server::on_receive(channel::state_updates, const connection_ptr& conn,
                 [&](const message::player_move& m) {
                     player.velocity = m.input * 10.f;
                     //player.position += player.velocity * (1.f / 60.f) * float(current_state.time - m.time);
+                },
+                [&](const message::player_fire& m) {
+                    auto newKunai = server::kunai_info();
+                    newKunai.active = true;
+                    newKunai.direction = m.direction;
+                    newKunai.position = player.position;
+                    newKunai.velocity = m.direction * 5.0f;
+                    current_state.projectiles[0] = newKunai;
                 },
                 [&](const auto&) {
                     std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;

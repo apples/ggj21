@@ -22,6 +22,8 @@ void scene_gameplay::tick(float delta) {
     const auto& state = context.get_state();
 
     auto input_dir = glm::vec2{0, 0};
+    auto direction = glm::vec2{0, 0};
+    bool fire = false;
 
     if (state.me) {
         auto keys = SDL_GetKeyboardState(nullptr);
@@ -30,9 +32,17 @@ void scene_gameplay::tick(float delta) {
         input_dir.x += int(bool(keys[SDL_Scancode::SDL_SCANCODE_D]));
         input_dir.y -= int(bool(keys[SDL_Scancode::SDL_SCANCODE_S]));
         input_dir.y += int(bool(keys[SDL_Scancode::SDL_SCANCODE_W]));
+
+        int x;
+        int y;
+        if(SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            fire = true;
+        }
+        direction = glm::vec2(x / engine->display.width, y / engine->display.height);
+        
     }
 
-    context.tick(delta, input_dir);
+    context.tick(delta, input_dir, direction);
 }
 
 void scene_gameplay::render() {

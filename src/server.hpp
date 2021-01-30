@@ -17,11 +17,21 @@ struct player_info {
     team_name team = team_name::BLACK;
     glm::vec2 position = {0, 0};
     glm::vec2 velocity = {0, 0};
+    glm::vec2 direction = {0, 0};
+};
+
+struct kunai_info {
+    bool active = false;
+    team_name team = team_name::BLACK;
+    glm::vec2 position = {0, 0};
+    glm::vec2 velocity = {0, 0};
+    glm::vec2 direction = {0, 0};
 };
 
 struct game_state {
     int time = 0;
     std::array<player_info, 4> players;
+    std::array<kunai_info, 8> projectiles;
 };
 
 class game_server {

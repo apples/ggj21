@@ -74,12 +74,15 @@ auto game_client::get_state() -> const game_state& {
     return predicted_state;
 }
 
-void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir) {
+void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir, const glm::vec2& direction) {
     if (context->connection && current_state.me) {
         auto msg = message::player_move{};
         msg.time = predicted_state.time;
         msg.input = input_dir;
+        msg.direction = direction;
         send_message<channel::state_updates>(context->connection, msg);
+
+        //auto fireMsg = message::
     }
 
     predicted_state.time += delta * 60.0;
@@ -91,7 +94,19 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir)
         }
     }
 
+    for (auto& kunai : predicted_state.projectiles) {
+        if (kunai.active) {
+            kunai.position += kunai.velocity * delta;
+        }
+    }
+
     context->context.poll_events(*this);
+}
+
+void game_client::fire(const glm::vec2& direction) {
+    auto msg = message::player_fire{};
+    msg.direction = direction;
+    send_message<channel::state_updates>(context->connection, msg);
 }
 
 void game_client::on_connect(const connection_ptr& conn) {

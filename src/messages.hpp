@@ -30,8 +30,16 @@ struct game_state_update {
         }
     };
 
+    struct kunai_info {
+        bool active = false;
+        team_name team = team_name::BLACK;
+        glm::vec2 position = {0, 0};
+        glm::vec2 velocity = {0, 0};
+    };
+
     int time = 0;
     std::array<player_info, 4> players = {};
+    std::array<kunai_info, 8> projectiles = {};
     int me = 0;
 
     template <typename Archive>
@@ -45,6 +53,7 @@ struct game_state_update {
 struct player_move {
     int time = 0;
     glm::vec2 input = {0, 0};
+    glm::vec2 direction = {0, 0};
 
     template <typename Archive>
     void serialize(Archive& archive) {
@@ -75,10 +84,23 @@ struct lobby_state_update {
     }
 };
 
+struct player_fire {
+    //int time = 0;//necessary?
+    glm::vec2 direction = {0, 0};
+
+    template <typename Archive>
+    void serialize(Archive& archive) {
+        archive(direction.x, direction.y);
+        //archive(time);
+        //archive(input.x, input.y);
+    }
+};
+
 using any = std::variant<
     game_state_update,
     player_move,
-    lobby_state_update>;
+    lobby_state_update,
+    player_fire>;
 
 } // namespace message
 

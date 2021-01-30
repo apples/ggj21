@@ -33,11 +33,20 @@ struct player_info {
     team_name team = team_name::BLACK;
     glm::vec2 position = {0, 0};
     glm::vec2 velocity = {0, 0};
+    glm::vec2 direction = {0, 0};
+};
+
+struct kunai_info {
+    bool active = false;
+    team_name team = team_name::BLACK;
+    glm::vec2 position = {0, 0};
+    glm::vec2 velocity = {0, 0};
 };
 
 struct game_state {
     double time = 0;
     std::array<player_info, 4> players;
+    std::array<kunai_info, 8> projectiles;
     std::optional<int> me = std::nullopt;
 };
 
@@ -75,7 +84,9 @@ public:
 
     auto get_state() -> const game_state&;
 
-    void tick(float delta, const glm::vec2& input_dir);
+    void tick(float delta, const glm::vec2& input_dir, const glm::vec2& direction);
+
+    void fire(const glm::vec2& direction);
 
     void on_connect(const connection_ptr& conn);
     void on_disconnect(const connection_ptr& conn, asio::error_code ec);
