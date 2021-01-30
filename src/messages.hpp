@@ -4,9 +4,13 @@
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/array.hpp>
+#include <cereal/types/optional.hpp>
 #include <cereal/types/variant.hpp>
 
 #include <glm/glm.hpp>
+
+#include <array>
+#include <optional>
 
 namespace message {
 
@@ -49,7 +53,32 @@ struct player_move {
     }
 };
 
-using any = std::variant<game_state_update, player_move>;
+struct lobby_state_update {
+    struct player_info {
+        team_name team = team_name::BLACK;
+        bool occupied = false;
+
+        template <typename Archive>
+        void serialize(Archive& archive) {
+            archive(team);
+            archive(occupied);
+        }
+    };
+
+    std::array<player_info, 4> players = {};
+    std::optional<int> me = {};
+
+    template <typename Archive>
+    void serialize(Archive& archive) {
+        archive(players);
+        archive(me);
+    }
+};
+
+using any = std::variant<
+    game_state_update,
+    player_move,
+    lobby_state_update>;
 
 } // namespace message
 

@@ -9,9 +9,9 @@
 #include <asio.hpp>
 #include <sol.hpp>
 
-class scene_gameplay final : public ember::scene {
+class scene_lobby final : public ember::scene {
 public:
-    scene_gameplay(
+    scene_lobby(
         ember::engine& eng,
         ember::scene* prev,
         std::shared_ptr<void> server_handle,
@@ -27,6 +27,6 @@ public:
 private:
     std::shared_ptr<void> server_handle;
     std::shared_ptr<game_renderer> renderer;
-    client::game_client context;
+    client::lobby_client context;
     sol::table gui_state;
 };
