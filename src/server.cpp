@@ -80,9 +80,15 @@ void game_server::tick(float delta) {
             }
         }
 
-        for(int i = 0; i < current_state.projectiles.size(); i++) {
-            update.projectiles[i].position = current_state.projectiles[i].position;
-            update.projectiles[i].velocity = current_state.projectiles[i].velocity;
+        for (auto i = 0u; i < current_state.projectiles.size(); ++i) {
+            if (current_state.projectiles[i].active) {
+                update.projectiles[i].active = true;
+                update.projectiles[i].team = current_state.projectiles[i].team;
+                update.projectiles[i].position = current_state.projectiles[i].position;
+                update.projectiles[i].velocity = current_state.projectiles[i].velocity;
+            } else {
+                update.projectiles[i].active = false;
+            }
         }
 
         for (auto i = 0u; i < current_state.players.size(); ++i) {
@@ -133,8 +139,30 @@ void game_server::on_receive(channel::state_updates, const connection_ptr& conn,
                     player.velocity = m.input * 10.f;
                     //player.position += player.velocity * (1.f / 60.f) * float(current_state.time - m.time);
                 },
+                [&](const auto&) {
+                    std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;
+                    conn->disconnect();
+                },
+            }, msg);
+
+            return;
+        }
+    }
+
+    // bad client?
+    std::cout << "Bad client " << conn->get_endpoint() << std::endl;
+    conn->disconnect();
+}
+
+void game_server::on_receive(channel::actions, const connection_ptr& conn, std::istream& data) {
+    for (auto& player : current_state.players) {
+        if (player.conn == conn) {
+            auto msg = receive_message(data);
+
+            std::visit(ember::utility::overload {
                 [&](const message::player_fire& m) {
-                    auto newKunai = server::kunai_info();
+                    std::cout << "Player fired kunai " << m.direction.x << ", " << m.direction.y << std::endl;
+                    auto newKunai = server::kunai_info{};
                     newKunai.active = true;
                     newKunai.direction = m.direction;
                     newKunai.position = player.position;

@@ -14,7 +14,8 @@ scene_gameplay::scene_gameplay(
       server_handle(server_handle),
       renderer(renderer),
       context(context),
-      gui_state{engine.lua.create_table()} {}
+      gui_state{engine.lua.create_table()},
+      last_mb(0) {}
 
 void scene_gameplay::init() {}
 
@@ -23,7 +24,6 @@ void scene_gameplay::tick(float delta) {
 
     auto input_dir = glm::vec2{0, 0};
     auto direction = glm::vec2{0, 0};
-    bool fire = false;
 
     if (state.me) {
         auto keys = SDL_GetKeyboardState(nullptr);
@@ -35,11 +35,18 @@ void scene_gameplay::tick(float delta) {
 
         int x;
         int y;
-        if(SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-            fire = true;
+        auto mb = SDL_GetMouseState(&x, &y);
+        auto mb_pressed = mb & ~last_mb;
+        [[maybe_unused]] auto mb_released = ~mb & last_mb;
+
+        last_mb = mb;
+
+        direction = glm::normalize(
+            glm::vec2{x - engine->display.width / 2, engine->display.height / 2 - y});
+
+        if (mb_pressed & SDL_BUTTON_LMASK) {
+            context.fire(direction);
         }
-        direction = glm::vec2(x / engine->display.width, y / engine->display.height);
-        
     }
 
     context.tick(delta, input_dir, direction);
@@ -63,6 +70,13 @@ void scene_gameplay::render() {
         auto& p = state.players[i];
         if (p.present) {
             renderer->draw_sprite("ninji", p.position, me && me->team == p.team, p.team == team_name::WHITE);
+        }
+    }
+
+    for (int i = 0; i < state.projectiles.size(); ++i) {
+        auto& p = state.projectiles[i];
+        if (p.active) {
+            renderer->draw_sprite("missileTemp", p.position, false, p.team == team_name::WHITE);
         }
     }
 

@@ -29,4 +29,6 @@ private:
     std::shared_ptr<game_renderer> renderer;
     client::game_client context;
     sol::table gui_state;
+
+    std::uint32_t last_mb;
 };

@@ -65,6 +65,8 @@ void lobby_client::on_receive(channel::state_updates, const connection_ptr& conn
     }, msg);
 }
 
+void lobby_client::on_receive(channel::actions, const connection_ptr& conn, std::istream& data) {}
+
 /* game_client */
 
 game_client::game_client(std::shared_ptr<game_client_context> context)
@@ -81,12 +83,10 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
         msg.input = input_dir;
         msg.direction = direction;
         send_message<channel::state_updates>(context->connection, msg);
-
-        //auto fireMsg = message::
     }
 
     predicted_state.time += delta * 60.0;
-    
+
     // physics
     for (auto& player : predicted_state.players) {
         if (player.present) {
@@ -106,7 +106,7 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
 void game_client::fire(const glm::vec2& direction) {
     auto msg = message::player_fire{};
     msg.direction = direction;
-    send_message<channel::state_updates>(context->connection, msg);
+    send_message<channel::actions>(context->connection, msg);
 }
 
 void game_client::on_connect(const connection_ptr& conn) {
@@ -136,6 +136,16 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
                     current_state.players[i].present = false;
                 }
             }
+            for (int i = 0; i < m.projectiles.size(); ++i) {
+                if (m.projectiles[i].active) {
+                    current_state.projectiles[i].active = true;
+                    current_state.projectiles[i].team = m.projectiles[i].team;
+                    current_state.projectiles[i].position = m.projectiles[i].position;
+                    current_state.projectiles[i].velocity = m.projectiles[i].velocity;
+                } else {
+                    current_state.projectiles[i].active = false;
+                }
+            }
             current_state.me = m.me;
             predicted_state = current_state;
         },
@@ -145,5 +155,7 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
         },
     }, msg);
 }
+
+void game_client::on_receive(channel::actions, const connection_ptr& conn, std::istream& data) {}
 
 } // namespace client

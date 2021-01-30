@@ -35,6 +35,14 @@ struct game_state_update {
         team_name team = team_name::BLACK;
         glm::vec2 position = {0, 0};
         glm::vec2 velocity = {0, 0};
+
+        template <typename Archive>
+        void serialize(Archive& archive) {
+            archive(active);
+            archive(team);
+            archive(position.x, position.y);
+            archive(velocity.x, velocity.y);
+        }
     };
 
     int time = 0;
@@ -46,6 +54,7 @@ struct game_state_update {
     void serialize(Archive& archive) {
         archive(time);
         archive(players);
+        archive(projectiles);
         archive(me);
     }
 };

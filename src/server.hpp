@@ -51,6 +51,7 @@ public:
     void on_connect(const connection_ptr& conn);
     void on_disconnect(const connection_ptr& conn, asio::error_code ec);
     void on_receive(channel::state_updates, const connection_ptr& conn, std::istream& data);
+    void on_receive(channel::actions, const connection_ptr& conn, std::istream& data);
 
 private:
     void schedule_tick();
