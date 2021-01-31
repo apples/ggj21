@@ -109,9 +109,9 @@ void game_renderer::draw_sprite(const std::string& name, const glm::vec2& pos, c
 void game_renderer::finish() {}
 
 void game_renderer::update_3d_audio(const glm::vec2& pos) {
-    //soloud.set3dListenerPosition(pos.x, pos.y, 0.f);
-    //soloud.set3dListenerUp(0.f, 1.f, 0.f);
-    //soloud.update3dAudio();
+    soloud.set3dListenerPosition(pos.x, pos.y, 0.f);
+    soloud.set3dListenerUp(0.f, 1.f, 0.f);
+    soloud.update3dAudio();
 }
 
 void game_renderer::play_sfx(const std::string& name) {
