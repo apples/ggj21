@@ -21,7 +21,9 @@ scene_gameplay::scene_gameplay(
       last_mb(0),
       anim_timer(0.f) {}
 
-void scene_gameplay::init() {}
+void scene_gameplay::init() {
+    renderer->play_bgm("UNS, Shinobi (mperezsounds).ogg");
+}
 
 void scene_gameplay::tick(float delta) {
     const auto& state = context.get_state();
@@ -50,6 +52,7 @@ void scene_gameplay::tick(float delta) {
 
         if (mb_pressed & SDL_BUTTON_LMASK && state.players[*state.me].alive) {
             context.fire(direction, state.players[*state.me].team);
+            renderer->play_sfx("KunaiHit_02.ogg");
         }
 
         if(bool(keys[SDL_Scancode::SDL_SCANCODE_LSHIFT])) {

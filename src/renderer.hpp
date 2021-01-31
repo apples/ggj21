@@ -45,7 +45,7 @@ private:
     std::unordered_map<std::string, sushi::texture_2d> sprite_textures;
     
     SoLoud::Soloud soloud;
-    std::unordered_map<std::string, SoLoud::Wav> sfx;
+    std::unordered_map<std::string, std::unique_ptr<SoLoud::Wav>> sfx;
     std::unordered_map<std::string, SoLoud::WavStream> bgm;
     std::optional<SoLoud::handle> bgm_handle;
 

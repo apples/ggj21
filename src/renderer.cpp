@@ -3,6 +3,9 @@
 
 #include <glm/gtx/vector_angle.hpp>
 
+#include <iostream>
+#include <soloud_sfxr.h>
+
 game_renderer::game_renderer(const display_info& display)
     : sprite_shader("data/shaders/sprite.vert", "data/shaders/sprite.frag"),
       background_shader("data/shaders/sprite.vert", "data/shaders/background1.frag"),
@@ -106,29 +109,29 @@ void game_renderer::draw_sprite(const std::string& name, const glm::vec2& pos, c
 void game_renderer::finish() {}
 
 void game_renderer::update_3d_audio(const glm::vec2& pos) {
-    soloud.set3dListenerPosition(pos.x, pos.y, 0.f);
-    soloud.set3dListenerUp(0.f, 1.f, 0.f);
-    soloud.update3dAudio();
+    //soloud.set3dListenerPosition(pos.x, pos.y, 0.f);
+    //soloud.set3dListenerUp(0.f, 1.f, 0.f);
+    //soloud.update3dAudio();
 }
 
 void game_renderer::play_sfx(const std::string& name) {
     auto iter = sfx.find(name);
     if (iter == sfx.end()) {
-        iter = sfx.emplace(name, SoLoud::Wav{}).first;
-        iter->second.load(("data/sounds/" + name).c_str());
+        iter = sfx.emplace(name, std::make_unique<SoLoud::Wav>()).first;
+        iter->second->load(("data/sounds/" + name).c_str());
     }
 
-    soloud.play(iter->second);
+    soloud.play(*iter->second);
 }
 
 void game_renderer::play_sfx(const std::string& name, const glm::vec2& pos) {
     auto iter = sfx.find(name);
     if (iter == sfx.end()) {
-        iter = sfx.emplace(name, SoLoud::Wav{}).first;
-        iter->second.load(("data/sounds/" + name).c_str());
+        iter = sfx.emplace(name, std::make_unique<SoLoud::Wav>()).first;
+        iter->second->load(("data/sounds/" + name).c_str());
     }
 
-    soloud.play3d(iter->second, pos.x, pos.y, 0.f);
+    soloud.play3d(*iter->second, pos.x, pos.y, 0.f);
 }
 
 void game_renderer::play_bgm(const std::string& name) {
