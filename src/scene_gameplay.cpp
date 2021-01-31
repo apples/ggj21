@@ -52,7 +52,10 @@ void scene_gameplay::tick(float delta) {
 
         if (mb_pressed & SDL_BUTTON_LMASK && state.players[*state.me].alive) {
             context.fire(direction, state.players[*state.me].team);
-            renderer->play_sfx("KunaiHit_02.ogg");
+            std::string filename = "Unspotted_KunaiThrow_0";
+            filename.append(std::to_string(rand() % 6));
+            filename.append(".ogg");
+            renderer->play_sfx(filename, state.players[*state.me].position);
         }
 
         if(bool(keys[SDL_Scancode::SDL_SCANCODE_LSHIFT])) {
