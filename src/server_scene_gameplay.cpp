@@ -144,6 +144,7 @@ void scene_gameplay::tick(float delta) {
                     case kunai_state::FLYING: {
                         if (kunai.team != player.team && collides_with(kunai.position, 0.25, player.position, 0.5f)) {
                             player.alive = false;
+                            player.carrying = false;
                             std::cout << "Hit!" << std::endl;
                         }
                         break;
