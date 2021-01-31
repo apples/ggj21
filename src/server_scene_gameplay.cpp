@@ -30,6 +30,20 @@ void scene_gameplay::tick(float delta) {
         }
     }
 
+    //collision
+    for(auto& kunai : current_state.projectiles) {
+        for(auto& player : current_state.players) {
+            if(kunai.active /*&& player.alive*/ && kunai.team != player.team && player.conn &&
+                kunai.position.x + .125 > player.position.x - .5 &&
+                kunai.position.x - .125 < player.position.x + .5 &&
+                kunai.position.y + .25 > player.position.y - .5 &&
+                kunai.position.y - .25 < player.position.y + .5) {
+                    player.alive = false;
+                    std::cout << "Hit!" << std::endl;
+                }
+        }
+    }
+
     // send state to clients
     {
         auto update = message::game_state_update{};
@@ -50,6 +64,7 @@ void scene_gameplay::tick(float delta) {
         for (auto i = 0u; i < current_state.projectiles.size(); ++i) {
             if (current_state.projectiles[i].active) {
                 update.projectiles[i].active = true;
+                update.projectiles[i].color = current_state.projectiles[i].color;
                 update.projectiles[i].team = current_state.projectiles[i].team;
                 update.projectiles[i].position = current_state.projectiles[i].position;
                 update.projectiles[i].velocity = current_state.projectiles[i].velocity;
@@ -136,7 +151,7 @@ void scene_gameplay::on_receive(channel::actions, const connection_ptr& conn, st
                         newKunai.active = true;
                         newKunai.direction = m.direction;
                         newKunai.position = player.position;
-                        newKunai.velocity = m.direction * 5.0f;
+                        newKunai.velocity = m.direction * 20.0f;
                         current_state.projectiles[0] = newKunai;
                     },
                     [&](const auto&) {

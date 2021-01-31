@@ -46,7 +46,7 @@ void scene_gameplay::tick(float delta) {
             glm::vec2{x - engine->display.width / 2, engine->display.height / 2 - y});
 
         if (mb_pressed & SDL_BUTTON_LMASK) {
-            context.fire(direction);
+            context.fire(direction, state.players[*state.me].team);
         }
     }
 
@@ -77,7 +77,7 @@ void scene_gameplay::render() {
     for (int i = 0; i < state.projectiles.size(); ++i) {
         auto& p = state.projectiles[i];
         if (p.active) {
-            renderer->draw_sprite("missileTemp", p.position, false, p.team == team_name::WHITE);
+            renderer->draw_sprite("BasicKunaiW", p.position, false, p.color == team_name::WHITE);
         }
     }
 
