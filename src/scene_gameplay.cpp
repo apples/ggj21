@@ -65,7 +65,7 @@ void scene_gameplay::render() {
 
     renderer->begin();
 
-    renderer->draw_background(state.time, {100, 100});
+    renderer->draw_background(state.time, {40, 20});
 
     for (int i = 0; i < state.players.size(); ++i) {
         auto& p = state.players[i];

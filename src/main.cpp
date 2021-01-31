@@ -33,8 +33,8 @@ int main(int argc, char* argv[]) try {
     std::cout << "Loading config..." << std::endl;
 
     auto config = ember::config::config{};
-    config.display.width = 1280;
-    config.display.height = 720;
+    config.display.width = 1920;
+    config.display.height = 1080;
 
     std::cout << "Instantiating engine..." << std::endl;
 

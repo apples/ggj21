@@ -150,6 +150,8 @@ void scene_gameplay::on_receive(channel::actions, const connection_ptr& conn, st
                         std::cout << "Player fired kunai " << m.direction.x << ", " << m.direction.y << std::endl;
                         auto newKunai = server::kunai_info{};
                         newKunai.active = true;
+                        newKunai.team = m.team;
+                        newKunai.color = m.team;//temporary testing
                         newKunai.direction = m.direction;
                         newKunai.position = player.position;
                         newKunai.velocity = m.direction * 20.0f;
