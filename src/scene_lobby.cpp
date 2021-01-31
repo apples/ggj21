@@ -36,7 +36,9 @@ void scene_lobby::render() {
     for (auto i = 0u; i < state.players.size(); ++i) {
         auto& p = state.players[i];
 
-        renderer->draw_sprite("ninji", {-7.5f + 5.f * i, 0}, i == state.me, p.team == team_name::WHITE);
+        if (p.occupied) {
+            renderer->draw_sprite("ninji", {-7.5f + 5.f * i, 0}, true, p.team == team_name::WHITE);
+        }
     }
 
     renderer->finish();

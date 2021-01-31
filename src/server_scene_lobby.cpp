@@ -22,6 +22,7 @@ void scene_lobby::tick(float delta) {
                 update.players[i].team = current_state.players[i].team;
             } else {
                 update.players[i].occupied = false;
+                update.players[i].team = current_state.players[i].team;
             }
         }
 
