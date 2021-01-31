@@ -62,6 +62,14 @@ void scene_gameplay::tick(float delta) {
             input_dir.x /= 2;
             input_dir.y /= 2;
         }
+
+        if(abs(input_dir.x) > .5 || abs(input_dir.y) > .5 &&
+            int(anim_timer * 6) % 4 == 0) {
+                std::string filename = "Unspotted_GrassStep_0";
+                filename.append(std::to_string(rand() % 9));
+                filename.append(".ogg");
+                renderer->play_sfx(filename, state.players[*state.me].position);
+        }
     }
 
     gui_state["score_black"] = state.score_black;
