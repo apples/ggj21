@@ -5,6 +5,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/optional.hpp>
+#include <cereal/types/string.hpp>
 #include <cereal/types/variant.hpp>
 
 #include <glm/glm.hpp>
@@ -152,6 +153,34 @@ struct game_started {
     }
 };
 
+struct play_sfx {
+    std::string name = "";
+    std::optional<glm::vec2> position = std::nullopt;
+
+    template <class Archive>
+    void save(Archive& ar) const {
+        ar(name);
+        if (position) {
+            ar(true, position->x, position->y);
+        } else {
+            ar(false);
+        }
+    }
+
+    template <class Archive>
+    void load(Archive& ar) {
+        ar(name);
+        bool b;
+        ar(b);
+        if (b) {
+            position = glm::vec2{};
+            ar(position->x, position->y);
+        } else {
+            position = std::nullopt;
+        }
+    }
+};
+
 using any = std::variant<
     game_state_update,
     player_move,
@@ -159,7 +188,8 @@ using any = std::variant<
     player_fire,
     lobby_flip_color,
     lobby_start_game,
-    game_started>;
+    game_started,
+    play_sfx>;
 
 } // namespace message
 

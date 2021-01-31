@@ -203,6 +203,18 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
     }, msg);
 }
 
-void game_client::on_receive(channel::actions, const connection_ptr& conn, std::istream& data) {}
+void game_client::on_receive(channel::actions, const connection_ptr& conn, std::istream& data) {
+    auto msg = receive_message(data);
+
+    std::visit(ember::utility::overload {
+        [&](const message::play_sfx& m) {
+            std::cout << "<= sfx " << m.name << std::endl;
+            sfx_queue.push_back(m);
+        },
+        [&](const auto&) {
+            std::cout << "Bad message from server " << conn->get_endpoint() << std::endl;
+        },
+    }, msg);
+}
 
 } // namespace client

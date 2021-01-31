@@ -147,4 +147,5 @@ void game_renderer::play_bgm(const std::string& name) {
     }
 
     bgm_handle = soloud.playBackground(iter->second);
+    soloud.setVolume(*bgm_handle, 0.5);
 }

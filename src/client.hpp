@@ -113,11 +113,16 @@ public:
     void on_receive(channel::state_updates, const connection_ptr& conn, std::istream& data);
     void on_receive(channel::actions, const connection_ptr& conn, std::istream& data);
 
+    auto get_sfx_queue() -> std::vector<message::play_sfx> {
+        return std::move(sfx_queue);
+    }
+
 private:
     std::shared_ptr<game_client_context> context;
 
     game_state current_state;
     game_state predicted_state;
+    std::vector<message::play_sfx> sfx_queue;
 };
 
 } // namespace client

@@ -55,6 +55,17 @@ void scene_gameplay::tick(float delta) {
         if (player.conn) {
             player.position += player.velocity * delta * (player.carrying ? .5f : 1.0f);
 
+            if (glm::length(player.direction) > .55f && int(current_state.time / 10) % 4 == 0) {
+                std::string filename = "GrassStep_0";
+                filename.append(std::to_string(rand() % 9));
+                filename.append(".ogg");
+                for (auto& p : current_state.players) {
+                    if (p.conn && p.conn != player.conn) {
+                        send_message<channel::actions>(p.conn, message::play_sfx{filename, player.position});
+                    }
+                }
+            }
+
             if(player.position.x > 59.5) {
                 player.position.x = 59.5;
             }
@@ -132,6 +143,15 @@ void scene_gameplay::tick(float delta) {
                         kunai2.state = kunai_state::ON_FLOOR;
                         kunai2.velocity = {0, 0};
                         kunai2.team = std::nullopt;
+                        
+                        auto roll = rng() % 4;
+                        auto sfx_name = "KunaiHit_0" + std::to_string(rng() % 4) + ".ogg";
+                        auto hit_pos = (kunai.position - kunai2.position) / 2.f + kunai2.position;
+                        for (auto& p : current_state.players) {
+                            if (p.conn) {
+                                send_message<channel::actions>(p.conn, message::play_sfx{sfx_name, hit_pos});
+                            }
+                        }
                     }
                 }
             }
@@ -150,12 +170,22 @@ void scene_gameplay::tick(float delta) {
                     }
                     case kunai_state::ON_FLOOR: {
                         if (collides_with(kunai.position, 0.25, player.position, 0.5f)) {
+                            auto psfx = [&]{
+                                auto sfx_name = "PickupOption_01.ogg";
+                                for (auto& p : current_state.players) {
+                                    if (p.conn && p.conn != player.conn) {
+                                        send_message<channel::actions>(p.conn, message::play_sfx{sfx_name, player.position});
+                                    }
+                                }
+                            };
                             if (player.kunaiIds[0] == -1) {
                                 player.kunaiIds[0] = i;
                                 kunai.state = kunai_state::HELD;
+                                psfx();
                             } else if (player.kunaiIds[1] == -1) {
                                 player.kunaiIds[1] = i;
                                 kunai.state = kunai_state::HELD;
+                                psfx();
                             }
                         }
                         break;
@@ -172,6 +202,12 @@ void scene_gameplay::tick(float delta) {
                 if (collides_with(player.position, 0.5, current_state.objective.position, 0.5)) {
                     current_state.objective.carried = true;
                     player.carrying = true;
+                    auto sfx_name = "pause.ogg";
+                    for (auto& p : current_state.players) {
+                        if (p.conn) {
+                            send_message<channel::actions>(p.conn, message::play_sfx{sfx_name, player.position});
+                        }
+                    }
                 }
             }
         }
@@ -273,6 +309,7 @@ void scene_gameplay::on_receive(channel::state_updates, const connection_ptr& co
             std::visit(
                 ember::utility::overload{
                     [&](const message::player_move& m) {
+                        player.direction = m.input;
                         player.velocity = m.input * 10.f;
                         // player.position += player.velocity * (1.f / 60.f) * float(current_state.time - m.time);
                     },
@@ -313,6 +350,14 @@ void scene_gameplay::on_receive(channel::actions, const connection_ptr& conn, st
                             newKunai.position = player.position;
                             newKunai.velocity = m.direction * 20.0f;
                             newKunai.dist_travelled = 0.f;
+
+                            auto roll = rng() % 4;
+                            auto sfx_name = "KunaiThrow_0" + std::to_string(rng() % 5) + ".ogg";
+                            for (auto& p : current_state.players) {
+                                if (p.conn && p.conn != conn) {
+                                    send_message<channel::actions>(p.conn, message::play_sfx{sfx_name, newKunai.position});
+                                }
+                            }
                         }
                     },
                     [&](const auto&) {

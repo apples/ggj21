@@ -39,6 +39,10 @@ void scene_gameplay::tick(float delta) {
         input_dir.y -= int(bool(keys[SDL_Scancode::SDL_SCANCODE_S]));
         input_dir.y += int(bool(keys[SDL_Scancode::SDL_SCANCODE_W]));
 
+        if (input_dir != glm::vec2{0, 0}) {
+            input_dir = glm::normalize(input_dir);
+        }
+
         int x;
         int y;
         auto mb = SDL_GetMouseState(&x, &y);
@@ -52,7 +56,7 @@ void scene_gameplay::tick(float delta) {
 
         if (mb_pressed & SDL_BUTTON_LMASK && state.players[*state.me].alive) {
             context.fire(direction, state.players[*state.me].team);
-            std::string filename = "Unspotted_KunaiThrow_0";
+            std::string filename = "KunaiThrow_0";
             filename.append(std::to_string(rand() % 6));
             filename.append(".ogg");
             renderer->play_sfx(filename, state.players[*state.me].position);
@@ -63,12 +67,11 @@ void scene_gameplay::tick(float delta) {
             input_dir.y /= 2;
         }
 
-        if(abs(input_dir.x) > .5 || abs(input_dir.y) > .5 &&
-            int(anim_timer * 6) % 4 == 0) {
-                std::string filename = "Unspotted_GrassStep_0";
-                filename.append(std::to_string(rand() % 9));
-                filename.append(".ogg");
-                renderer->play_sfx(filename, state.players[*state.me].position);
+        if(glm::length(input_dir) > .55f && int(anim_timer * 6) % 4 == 0) {
+            std::string filename = "GrassStep_0";
+            filename.append(std::to_string(rand() % 9));
+            filename.append(".ogg");
+            renderer->play_sfx(filename, state.players[*state.me].position);
         }
     }
 
@@ -81,6 +84,14 @@ void scene_gameplay::tick(float delta) {
     
     if (state.me) {
         renderer->update_3d_audio(state.players[*state.me].position);
+    }
+
+    for (auto& m : context.get_sfx_queue()) {
+        if (m.position) {
+            renderer->play_sfx(m.name, *m.position);
+        } else {
+            renderer->play_sfx(m.name);
+        }
     }
 }
 
