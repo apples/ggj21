@@ -22,17 +22,11 @@ scene_gameplay::scene_gameplay(
 
 void scene_gameplay::init() {}
 
-//collision
-auto collides_with = [](const auto& p1, float r1, const auto& p2, float r2) {
-    return glm::length(p1 - p2) <= (r1 + r2);
-};
-
 void scene_gameplay::tick(float delta) {
     const auto& state = context.get_state();
 
     auto input_dir = glm::vec2{0, 0};
     auto direction = glm::vec2{0, 0};
-    bool carrying = false;
 
     if (state.me) {
         auto keys = SDL_GetKeyboardState(nullptr);
@@ -56,11 +50,9 @@ void scene_gameplay::tick(float delta) {
         if (mb_pressed & SDL_BUTTON_LMASK && state.players[*state.me].alive) {
             context.fire(direction, state.players[*state.me].team);
         }
-
-        carrying = bool(keys[SDL_Scancode::SDL_SCANCODE_SPACE]) && collides_with(state.players[*state.me].position, .5f, state.objective.position, 1.0f);
     }
 
-    context.tick(delta, input_dir, direction, carrying);
+    context.tick(delta, input_dir, direction);
 }
 
 void scene_gameplay::render() {

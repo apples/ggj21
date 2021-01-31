@@ -99,7 +99,7 @@ public:
 
     auto get_state() -> const game_state&;
 
-    void tick(float delta, const glm::vec2& input_dir, const glm::vec2& direction, bool carrying);
+    void tick(float delta, const glm::vec2& input_dir, const glm::vec2& direction);
 
     void fire(const glm::vec2& direction, team_name team);
 

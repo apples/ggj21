@@ -102,7 +102,7 @@ auto game_client::get_state() -> const game_state& {
     return predicted_state;
 }
 
-void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir, const glm::vec2& direction, bool carrying) {
+void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir, const glm::vec2& direction) {
     if (context->connection && current_state.me) {
         auto msg = message::player_move{};
         msg.time = predicted_state.time;
@@ -113,28 +113,26 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
 
     predicted_state.time += delta * 60.0;
 
-    predicted_state.players[*current_state.me].carrying = carrying;//this is probably where a problem is, couldn't update state before in scene_gameplay though
-
     // physics
     for (auto& player : predicted_state.players) {
         if (player.present) {
             player.position += player.velocity * delta * (player.carrying ? .5f : 1.0f);
 
-            if(player.position.x > 59.5) {
+            if (player.position.x > 59.5) {
                 player.position.x = 59.5;
             }
-            if(player.position.x < 0.5) {
+            if (player.position.x < 0.5) {
                 player.position.x = 0.5;
             }
-            if(player.position.y > 29.5) {
+            if (player.position.y > 29.5) {
                 player.position.y = 29.5;
             }
-            if(player.position.y < 0.5) {
+            if (player.position.y < 0.5) {
                 player.position.y = 0.5;
             }
 
-            if(player.carrying) {
-                predicted_state.objective.position += player.velocity * delta * .5f;
+            if (player.carrying) {
+                predicted_state.objective.position = player.position;
             }
         }
     }

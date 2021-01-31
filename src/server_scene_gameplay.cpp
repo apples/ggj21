@@ -67,7 +67,7 @@ void scene_gameplay::tick(float delta) {
             }
 
             if(player.carrying) {
-                current_state.objective.position += player.velocity * delta * .5f;
+                current_state.objective.position = player.position;
             }
         }
     }
@@ -92,6 +92,7 @@ void scene_gameplay::tick(float delta) {
     for(auto i = 0u; i < current_state.projectiles.size(); ++i) {
         auto& kunai = current_state.projectiles[i];
 
+        // kunai <=> kunai
         if (kunai.state == kunai_state::FLYING) {
             for(auto& kunai2 : current_state.projectiles) {
                 if (&kunai == &kunai2) continue;
@@ -109,6 +110,7 @@ void scene_gameplay::tick(float delta) {
             }
         }
 
+        // kunai <=> player
         for(auto& player : current_state.players) {
             if (player.conn && player.alive) {
                 switch (kunai.state) {
@@ -131,6 +133,18 @@ void scene_gameplay::tick(float delta) {
                         }
                         break;
                     }
+                }
+            }
+        }
+    }
+
+    // player <=> objective
+    if (!current_state.objective.carried) {
+        for (auto& player : current_state.players) {
+            if (player.conn && player.alive) {
+                if (collides_with(player.position, 0.5, current_state.objective.position, 0.5)) {
+                    current_state.objective.carried = true;
+                    player.carrying = true;
                 }
             }
         }

@@ -36,6 +36,7 @@ struct kunai_info {
 
 struct objective_info {
     glm::vec2 position = {30, 15};
+    bool carried = false;
 };
 
 struct game_state {

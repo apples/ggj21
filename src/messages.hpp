@@ -74,6 +74,7 @@ struct game_state_update {
         archive(players);
         archive(projectiles);
         archive(me);
+        archive(objective);
     }
 };
 
