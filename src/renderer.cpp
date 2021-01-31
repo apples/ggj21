@@ -64,16 +64,18 @@ void game_renderer::draw_background(int time, const glm::vec2& world_size) {
 }
 
 void game_renderer::draw_sprite(const std::string& name, const glm::vec2& pos, bool my_team, bool white) {
-    draw_sprite(name, pos, {0.f, 0.f}, my_team, white);
+    draw_sprite(name, pos, {0.f, 0.f}, {1.f, 1.f}, my_team, white);
 }
 
-void game_renderer::draw_sprite(const std::string& name, const glm::vec2& pos, const glm::vec2& facing, bool my_team, bool white) {
+void game_renderer::draw_sprite(const std::string& name, const glm::vec2& pos, const glm::vec2& facing, const glm::vec2& scale, bool my_team, bool white) {
     auto model = glm::translate(glm::mat4(1.f), glm::vec3{pos, 0});
 
     if (facing != glm::vec2{0.f, 0.f}) {
         auto angle = std::atan2(facing.y, facing.x);
         model = glm::rotate(model, angle, {0, 0, 1});
     }
+    
+    model = glm::scale(model, {scale, 1});
 
     sprite_shader.bind();
     sprite_shader.set_MVP(projview * model);

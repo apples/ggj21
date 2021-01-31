@@ -34,4 +34,6 @@ private:
 
     glm::vec2 world_size;
     std::uint32_t last_mb;
+
+    float anim_timer;
 };
