@@ -105,11 +105,23 @@ struct player_fire {
     }
 };
 
+struct lobby_flip_color {
+    template <typename Archive>
+    void serialize(Archive& archive) {}
+};
+
+struct lobby_start {
+    template <typename Archive>
+    void serialize(Archive& archive) {}
+};
+
 using any = std::variant<
     game_state_update,
     player_move,
     lobby_state_update,
-    player_fire>;
+    player_fire,
+    lobby_flip_color,
+    lobby_start>;
 
 } // namespace message
 

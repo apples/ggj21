@@ -1,6 +1,6 @@
 #include "scene_mainmenu.hpp"
 
-#include "scene_gameplay.hpp"
+#include "scene_lobby.hpp"
 #include "server.hpp"
 #include "renderer.hpp"
 
@@ -35,7 +35,7 @@ void scene_mainmenu::start_game() {
     auto server_addr = asio::ip::udp::endpoint{asio::ip::make_address_v6("::1"), server->get_endpoint().port()};
     auto context = std::make_shared<client::game_client_context>(*engine->io, server_addr);
     context->start();
-    engine->queue_transition<scene_gameplay>(false, server, renderer, context);
+    engine->queue_transition<scene_lobby>(false, server, renderer, context);
 }
 
 void scene_mainmenu::join_game(const std::string& addr_str) {
@@ -44,5 +44,5 @@ void scene_mainmenu::join_game(const std::string& addr_str) {
     auto server_endpoint = asio::ip::udp::endpoint{addr, 6969};
     auto context = std::make_shared<client::game_client_context>(*engine->io, server_endpoint);
     context->start();
-    engine->queue_transition<scene_gameplay>(false, nullptr, renderer, context);
+    engine->queue_transition<scene_lobby>(false, nullptr, renderer, context);
 }

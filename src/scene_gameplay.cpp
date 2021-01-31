@@ -7,13 +7,14 @@
 scene_gameplay::scene_gameplay(
     ember::engine& engine,
     ember::scene* prev,
+    const client::lobby_state* lobby,
     std::shared_ptr<void> server_handle,
     std::shared_ptr<game_renderer> renderer,
     std::shared_ptr<client::game_client_context> context)
     : scene(engine),
       server_handle(server_handle),
       renderer(renderer),
-      context(context),
+      context(context, *lobby),
       gui_state{engine.lua.create_table()},
       last_mb(0) {}
 

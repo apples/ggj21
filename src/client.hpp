@@ -58,6 +58,7 @@ struct lobby_player_info {
 struct lobby_state {
     std::optional<int> me = std::nullopt;
     std::array<lobby_player_info, 4> players;
+    bool game_starting = false;
 };
 
 class lobby_client {
@@ -66,7 +67,11 @@ public:
 
     auto get_state() -> const lobby_state&;
 
-    void tick(float delta);
+    auto get_context() -> const std::shared_ptr<game_client_context>&;
+
+    [[nodiscard]] bool tick(float delta);
+
+    void start_game();
 
     void on_connect(const connection_ptr& conn);
     void on_disconnect(const connection_ptr& conn, asio::error_code ec);
@@ -81,7 +86,7 @@ private:
 
 class game_client {
 public:
-    game_client(std::shared_ptr<game_client_context> context);
+    game_client(std::shared_ptr<game_client_context> context, const lobby_state& lobby);
 
     auto get_state() -> const game_state&;
 

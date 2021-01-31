@@ -32,8 +32,18 @@ auto lobby_client::get_state() -> const lobby_state& {
     return current_state;
 }
 
-void lobby_client::tick([[maybe_unused]] float delta) {
+auto lobby_client::get_context() -> const std::shared_ptr<game_client_context>& {
+    return context;
+}
+
+bool lobby_client::tick([[maybe_unused]] float delta) {
     context->context.poll_events(*this);
+
+    return current_state.game_starting;
+}
+
+void lobby_client::start_game() {
+    send_message<channel::actions>(context->connection, message::lobby_start{});
 }
 
 void lobby_client::on_connect(const connection_ptr& conn) {
@@ -59,18 +69,34 @@ void lobby_client::on_receive(channel::state_updates, const connection_ptr& conn
             }
         },
         [&](const auto&) {
-            std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;
-            conn->disconnect();
+            std::cout << "Bad message from server " << conn->get_endpoint() << std::endl;
         },
     }, msg);
 }
 
-void lobby_client::on_receive(channel::actions, const connection_ptr& conn, std::istream& data) {}
+void lobby_client::on_receive(channel::actions, const connection_ptr& conn, std::istream& data) {
+    auto msg = receive_message(data);
+
+    std::visit(ember::utility::overload {
+        [&](const message::lobby_start& m) {
+            current_state.game_starting = true;
+        },
+        [&](const auto&) {
+            std::cout << "Bad message from server " << conn->get_endpoint() << std::endl;
+        },
+    }, msg);
+}
 
 /* game_client */
 
-game_client::game_client(std::shared_ptr<game_client_context> context)
-    : context(context), current_state(), predicted_state() {}
+game_client::game_client(std::shared_ptr<game_client_context> context, const lobby_state& lobby)
+    : context(context), current_state(), predicted_state() {
+    current_state.me = lobby.me;
+    for (auto i = 0u; i < lobby.players.size(); ++i) {
+        current_state.players[i].team = lobby.players[i].team;
+        current_state.players[i].present = lobby.players[i].occupied;
+    }
+}
 
 auto game_client::get_state() -> const game_state& {
     return predicted_state;
@@ -150,8 +176,7 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
             predicted_state = current_state;
         },
         [&](const auto&) {
-            std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;
-            conn->disconnect();
+            std::cout << "Bad message from server " << conn->get_endpoint() << std::endl;
         },
     }, msg);
 }
