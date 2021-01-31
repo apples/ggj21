@@ -49,6 +49,8 @@ struct kunai_info {
 
 struct objective_info {
     glm::vec2 position = {0, 0};
+    glm::vec2 goal_black = {0, 0};
+    glm::vec2 goal_white = {0, 0};
 };
 
 struct game_state {
@@ -57,6 +59,8 @@ struct game_state {
     std::array<kunai_info, 8> projectiles;
     std::optional<int> me = std::nullopt;
     objective_info objective;
+    int score_black = 0;
+    int score_white = 0;
 };
 
 struct lobby_player_info {

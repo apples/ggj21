@@ -55,10 +55,14 @@ struct game_state_update {
 
     struct objective_info {
         glm::vec2 position = {30, 15};
+        glm::vec2 goal_black = {0, 0};
+        glm::vec2 goal_white = {0, 0};
 
         template <typename Archive>
         void serialize(Archive& archive) {
             archive(position.x, position.y);
+            archive(goal_black.x, goal_black.y);
+            archive(goal_white.x, goal_white.y);
         }
     };
 
@@ -67,6 +71,8 @@ struct game_state_update {
     std::array<kunai_info, 8> projectiles = {};
     int me = 0;
     objective_info objective = {};
+    int score_black = 0;
+    int score_white = 0;
 
     template <typename Archive>
     void serialize(Archive& archive) {
@@ -75,6 +81,8 @@ struct game_state_update {
         archive(projectiles);
         archive(me);
         archive(objective);
+        archive(score_black);
+        archive(score_white);
     }
 };
 

@@ -190,6 +190,10 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
                 current_state.projectiles[i].velocity = m.projectiles[i].velocity;
             }
             current_state.objective.position = m.objective.position;
+            current_state.objective.goal_black = m.objective.goal_black;
+            current_state.objective.goal_white = m.objective.goal_white;
+            current_state.score_black = m.score_black;
+            current_state.score_white = m.score_white;
             current_state.me = m.me;
             predicted_state = current_state;
         },

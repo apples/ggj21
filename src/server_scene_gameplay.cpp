@@ -29,8 +29,10 @@ scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls, const
                 current_state.players[i].position = glm::vec2(0, 0);
         }
     }
-
+    
     current_state.objective.position = glm::vec2(30, 15);
+    current_state.objective.goal_black = glm::vec2(2, 15);
+    current_state.objective.goal_white = glm::vec2(58, 15);
 
     auto wsx_dist = std::uniform_real_distribution{10.f, world_size.x - 10.f};
     auto wsy_dist = std::uniform_real_distribution{10.f, world_size.y - 10.f};
@@ -150,6 +152,21 @@ void scene_gameplay::tick(float delta) {
         }
     }
 
+    // player <=> pedestal
+    for (auto& player : current_state.players) {
+        if (player.conn && player.alive) {
+            auto& goal = player.team == team_name::BLACK ? current_state.objective.goal_black : current_state.objective.goal_white;
+            auto& score = player.team == team_name::BLACK ? current_state.score_black : current_state.score_white;
+
+            if (player.carrying && collides_with(player.position, 0.5, goal, 0.5)) {
+                current_state.objective.carried = false;
+                current_state.objective.position = glm::vec2(30, 15);
+                player.carrying = false;
+                ++score;
+            }
+        }
+    }
+
     // send state to clients
     {
         auto update = message::game_state_update{};
@@ -178,6 +195,11 @@ void scene_gameplay::tick(float delta) {
         }
 
         update.objective.position = current_state.objective.position;
+        update.objective.goal_black = current_state.objective.goal_black;
+        update.objective.goal_white = current_state.objective.goal_white;
+
+        update.score_black = current_state.score_black;
+        update.score_white = current_state.score_white;
 
         for (auto i = 0u; i < current_state.players.size(); ++i) {
             auto& p = current_state.players[i];

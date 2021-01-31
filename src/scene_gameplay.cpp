@@ -52,6 +52,9 @@ void scene_gameplay::tick(float delta) {
         }
     }
 
+    gui_state["score_black"] = state.score_black;
+    gui_state["score_white"] = state.score_white;
+
     context.tick(delta, input_dir, direction);
 }
 
@@ -84,8 +87,9 @@ void scene_gameplay::render() {
         }
     }
 
-    renderer->draw_sprite(
-        "bagua", state.objective.position, true, true);
+    renderer->draw_sprite("bagua", state.objective.position, true, true);
+    renderer->draw_sprite("pedestal", state.objective.goal_black, true, true);
+    renderer->draw_sprite("pedestal", state.objective.goal_white, true, true);
 
     renderer->finish();
 }
