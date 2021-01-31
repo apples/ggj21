@@ -37,6 +37,9 @@ game_renderer::game_renderer(const display_info& display)
     camera.far = 10;
     camera.near = -10;
     camera.height = 10;
+
+    // audio
+    soloud.init();
 }
 
 void game_renderer::set_camera_pos(const glm::vec2& pos) {
@@ -101,3 +104,44 @@ void game_renderer::draw_sprite(const std::string& name, const glm::vec2& pos, c
 }
 
 void game_renderer::finish() {}
+
+void game_renderer::update_3d_audio(const glm::vec2& pos) {
+    soloud.set3dListenerPosition(pos.x, pos.y, 0.f);
+    soloud.set3dListenerUp(0.f, 1.f, 0.f);
+    soloud.update3dAudio();
+}
+
+void game_renderer::play_sfx(const std::string& name) {
+    auto iter = sfx.find(name);
+    if (iter == sfx.end()) {
+        iter = sfx.emplace(name, SoLoud::Wav{}).first;
+        iter->second.load(("data/sounds/" + name).c_str());
+    }
+
+    soloud.play(iter->second);
+}
+
+void game_renderer::play_sfx(const std::string& name, const glm::vec2& pos) {
+    auto iter = sfx.find(name);
+    if (iter == sfx.end()) {
+        iter = sfx.emplace(name, SoLoud::Wav{}).first;
+        iter->second.load(("data/sounds/" + name).c_str());
+    }
+
+    soloud.play3d(iter->second, pos.x, pos.y, 0.f);
+}
+
+void game_renderer::play_bgm(const std::string& name) {
+    auto iter = bgm.find(name);
+    if (iter == bgm.end()) {
+        iter = bgm.emplace(name, SoLoud::WavStream{}).first;
+        iter->second.load(("data/sounds/" + name).c_str());
+        iter->second.setLooping(1);
+    }
+
+    if (bgm_handle) {
+        soloud.stop(*bgm_handle);
+    }
+
+    bgm_handle = soloud.playBackground(iter->second);
+}

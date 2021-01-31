@@ -64,6 +64,10 @@ void scene_gameplay::tick(float delta) {
     context.tick(delta, input_dir, direction);
 
     anim_timer += delta;
+    
+    if (state.me) {
+        renderer->update_3d_audio(state.players[*state.me].position);
+    }
 }
 
 void scene_gameplay::render() {
