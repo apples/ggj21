@@ -94,12 +94,13 @@ void scene_lobby::on_receive(channel::actions, const connection_ptr& conn, std::
                     [&](const message::lobby_flip_color& m) {
                         player.team = (player.team == team_name::BLACK ? team_name::WHITE : team_name::BLACK);
                     },
-                    [&](const message::lobby_start& m) {
+                    [&](const message::lobby_start_game& m) {
                         std::cout << "Starting game" << std::endl;
-                        server->queue_transition<scene_gameplay>(&current_state);
+                        auto world_size = glm::vec2{50, 50};
+                        server->queue_transition<scene_gameplay>(&current_state, world_size);
                         for (auto& p : current_state.players) {
                             if (p.conn) {
-                                send_message<channel::actions>(p.conn, message::lobby_start{});
+                                send_message<channel::actions>(p.conn, message::game_started{world_size});
                             }
                         }
                     },

@@ -120,7 +120,7 @@ private:
 
 class scene_gameplay : public game_server_scene {
 public:
-    scene_gameplay(game_server& server, const lobby_state* ls);
+    scene_gameplay(game_server& server, const lobby_state* ls, const glm::vec2& world_size);
 
     virtual void tick(float delta) override;
 

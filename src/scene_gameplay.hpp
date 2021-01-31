@@ -17,7 +17,8 @@ public:
         const client::lobby_state* lobby,
         std::shared_ptr<void> server_handle,
         std::shared_ptr<game_renderer> renderer,
-        std::shared_ptr<client::game_client_context> context);
+        std::shared_ptr<client::game_client_context> context,
+        const glm::vec2& world_size);
 
     virtual void init() override;
     virtual void tick(float delta) override;
@@ -31,5 +32,6 @@ private:
     client::game_client context;
     sol::table gui_state;
 
+    glm::vec2 world_size;
     std::uint32_t last_mb;
 };

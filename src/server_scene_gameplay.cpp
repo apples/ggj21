@@ -6,8 +6,8 @@
 
 namespace server {
 
-scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls)
-    : game_server_scene(server), world_size{50, 50}, rng(std::random_device{}()) {
+scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls, const glm::vec2& world_size)
+    : game_server_scene(server), world_size(world_size), rng(std::random_device{}()) {
     for (auto i = 0u; i < ls->players.size(); ++i) {
         current_state.players[i].conn = ls->players[i].conn;
         current_state.players[i].team = ls->players[i].team;
