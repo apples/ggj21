@@ -103,9 +103,10 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
     context->context.poll_events(*this);
 }
 
-void game_client::fire(const glm::vec2& direction) {
+void game_client::fire(const glm::vec2& direction, team_name team) {
     auto msg = message::player_fire{};
     msg.direction = direction;
+    msg.team = team;
     send_message<channel::actions>(context->connection, msg);
 }
 
@@ -139,6 +140,7 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
             for (int i = 0; i < m.projectiles.size(); ++i) {
                 if (m.projectiles[i].active) {
                     current_state.projectiles[i].active = true;
+                    current_state.projectiles[i].color = m.projectiles[i].color;
                     current_state.projectiles[i].team = m.projectiles[i].team;
                     current_state.projectiles[i].position = m.projectiles[i].position;
                     current_state.projectiles[i].velocity = m.projectiles[i].velocity;

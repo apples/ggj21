@@ -32,6 +32,7 @@ struct game_state_update {
 
     struct kunai_info {
         bool active = false;
+        team_name color = team_name::BLACK;
         team_name team = team_name::BLACK;
         glm::vec2 position = {0, 0};
         glm::vec2 velocity = {0, 0};
@@ -96,12 +97,13 @@ struct lobby_state_update {
 struct player_fire {
     //int time = 0;//necessary?
     glm::vec2 direction = {0, 0};
+    team_name team = team_name::BLACK;
 
     template <typename Archive>
     void serialize(Archive& archive) {
         archive(direction.x, direction.y);
+        archive(team);
         //archive(time);
-        //archive(input.x, input.y);
     }
 };
 

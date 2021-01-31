@@ -30,6 +30,7 @@ public:
 
 struct player_info {
     bool present = false;
+    bool alive = true;
     team_name team = team_name::BLACK;
     glm::vec2 position = {0, 0};
     glm::vec2 velocity = {0, 0};
@@ -38,6 +39,7 @@ struct player_info {
 
 struct kunai_info {
     bool active = false;
+    team_name color = team_name::BLACK;
     team_name team = team_name::BLACK;
     glm::vec2 position = {0, 0};
     glm::vec2 velocity = {0, 0};
@@ -87,7 +89,7 @@ public:
 
     void tick(float delta, const glm::vec2& input_dir, const glm::vec2& direction);
 
-    void fire(const glm::vec2& direction);
+    void fire(const glm::vec2& direction, team_name team);
 
     void on_connect(const connection_ptr& conn);
     void on_disconnect(const connection_ptr& conn, asio::error_code ec);
