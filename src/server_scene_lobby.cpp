@@ -96,7 +96,7 @@ void scene_lobby::on_receive(channel::actions, const connection_ptr& conn, std::
                     },
                     [&](const message::lobby_start_game& m) {
                         std::cout << "Starting game" << std::endl;
-                        auto world_size = glm::vec2{50, 40};
+                        auto world_size = glm::vec2{60, 30};
                         server->queue_transition<scene_gameplay>(&current_state, world_size);
                         for (auto& p : current_state.players) {
                             if (p.conn) {

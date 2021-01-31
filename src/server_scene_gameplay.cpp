@@ -14,16 +14,16 @@ scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls, const
 
         switch(i) {
             case 0u:
-                current_state.players[i].position = glm::vec2(22, 2);
+                current_state.players[i].position = glm::vec2(2, 13);
                 break;
             case 1u:
-                current_state.players[i].position = glm::vec2(22, 38);
+                current_state.players[i].position = glm::vec2(58, 13);
                 break;
             case 2u:
-                current_state.players[i].position = glm::vec2(27, 2);
+                current_state.players[i].position = glm::vec2(2, 17);
                 break;
             case 3u:
-                current_state.players[i].position = glm::vec2(27, 38);
+                current_state.players[i].position = glm::vec2(58, 17);
                 break;
             default:
                 current_state.players[i].position = glm::vec2(0, 0);
@@ -50,14 +50,14 @@ void scene_gameplay::tick(float delta) {
     for (auto& player : current_state.players) {
         if (player.conn) {
             player.position += player.velocity * delta;
-            if(player.position.x > 49.5) {
-                player.position.x = 49.5;
+            if(player.position.x > 59.5) {
+                player.position.x = 59.5;
             }
             if(player.position.x < 0.5) {
                 player.position.x = 0.5;
             }
-            if(player.position.y > 39.5) {
-                player.position.y = 39.5;
+            if(player.position.y > 29.5) {
+                player.position.y = 29.5;
             }
             if(player.position.y < 0.5) {
                 player.position.y = 0.5;

@@ -117,14 +117,14 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
     for (auto& player : predicted_state.players) {
         if (player.present) {
             player.position += player.velocity * delta;
-            if(player.position.x > 49.5) {
-                player.position.x = 49.5;
+            if(player.position.x > 59.5) {
+                player.position.x = 59.5;
             }
             if(player.position.x < 0.5) {
                 player.position.x = 0.5;
             }
-            if(player.position.y > 39.5) {
-                player.position.y = 39.5;
+            if(player.position.y > 29.5) {
+                player.position.y = 29.5;
             }
             if(player.position.y < 0.5) {
                 player.position.y = 0.5;
