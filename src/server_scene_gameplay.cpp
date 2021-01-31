@@ -50,6 +50,18 @@ void scene_gameplay::tick(float delta) {
     for (auto& player : current_state.players) {
         if (player.conn) {
             player.position += player.velocity * delta;
+            if(player.position.x > 49.5) {
+                player.position.x = 49.5;
+            }
+            if(player.position.x < 0.5) {
+                player.position.x = 0.5;
+            }
+            if(player.position.y > 39.5) {
+                player.position.y = 39.5;
+            }
+            if(player.position.y < 0.5) {
+                player.position.y = 0.5;
+            }
         }
     }
 
