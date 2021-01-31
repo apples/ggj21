@@ -156,6 +156,7 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
             for (int i = 0; i < 4; ++i) {
                 if (m.players[i].present) {
                     current_state.players[i].present = true;
+                    current_state.players[i].alive = m.players[i].alive;
                     current_state.players[i].team = m.players[i].team;
                     current_state.players[i].position = m.players[i].position;
                     current_state.players[i].velocity = m.players[i].velocity;

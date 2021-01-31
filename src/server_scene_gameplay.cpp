@@ -33,7 +33,7 @@ void scene_gameplay::tick(float delta) {
     //collision
     for(auto& kunai : current_state.projectiles) {
         for(auto& player : current_state.players) {
-            if(kunai.active /*&& player.alive*/ && kunai.team != player.team && player.conn &&
+            if(kunai.active && player.alive && kunai.team != player.team && player.conn &&
                 kunai.position.x + .125 > player.position.x - .5 &&
                 kunai.position.x - .125 < player.position.x + .5 &&
                 kunai.position.y + .25 > player.position.y - .5 &&
@@ -53,6 +53,7 @@ void scene_gameplay::tick(float delta) {
         for (auto i = 0u; i < 4; ++i) {
             if (current_state.players[i].conn) {
                 update.players[i].present = true;
+                update.players[i].alive = current_state.players[i].alive;
                 update.players[i].team = current_state.players[i].team;
                 update.players[i].position = current_state.players[i].position;
                 update.players[i].velocity = current_state.players[i].velocity;
