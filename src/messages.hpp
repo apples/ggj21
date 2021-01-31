@@ -21,6 +21,7 @@ struct game_state_update {
         glm::vec2 position = {0, 0};
         glm::vec2 velocity = {0, 0};
         bool alive = true;
+        bool carrying = false;
         int kunaiAmount = 1;
 
         template <typename Archive>
@@ -30,6 +31,7 @@ struct game_state_update {
             archive(position.x, position.y);
             archive(velocity.x, velocity.y);
             archive(alive);
+            archive(carrying);
             archive(kunaiAmount);
         }
     };
@@ -51,10 +53,20 @@ struct game_state_update {
         }
     };
 
+    struct objective_info {
+        glm::vec2 position = {30, 15};
+
+        template <typename Archive>
+        void serialize(Archive& archive) {
+            archive(position.x, position.y);
+        }
+    };
+
     int time = 0;
     std::array<player_info, 4> players = {};
     std::array<kunai_info, 8> projectiles = {};
     int me = 0;
+    objective_info objective = {};
 
     template <typename Archive>
     void serialize(Archive& archive) {
@@ -100,7 +112,6 @@ struct lobby_state_update {
 };
 
 struct player_fire {
-    //int time = 0;//necessary?
     glm::vec2 direction = {0, 0};
     team_name team = team_name::BLACK;
 
@@ -108,7 +119,6 @@ struct player_fire {
     void serialize(Archive& archive) {
         archive(direction.x, direction.y);
         archive(team);
-        //archive(time);
     }
 };
 

@@ -30,6 +30,8 @@ scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls, const
         }
     }
 
+    current_state.objective.position = glm::vec2(30, 15);
+
     auto wsx_dist = std::uniform_real_distribution{10.f, world_size.x - 10.f};
     auto wsy_dist = std::uniform_real_distribution{10.f, world_size.y - 10.f};
 
@@ -49,7 +51,8 @@ void scene_gameplay::tick(float delta) {
     // physics
     for (auto& player : current_state.players) {
         if (player.conn) {
-            player.position += player.velocity * delta;
+            player.position += player.velocity * delta * (player.carrying ? .5f : 1.0f);
+
             if(player.position.x > 59.5) {
                 player.position.x = 59.5;
             }
@@ -61,6 +64,10 @@ void scene_gameplay::tick(float delta) {
             }
             if(player.position.y < 0.5) {
                 player.position.y = 0.5;
+            }
+
+            if(player.carrying) {
+                current_state.objective.position += player.velocity * delta * .5f;
             }
         }
     }
@@ -139,6 +146,7 @@ void scene_gameplay::tick(float delta) {
             if (current_state.players[i].conn) {
                 update.players[i].present = true;
                 update.players[i].alive = current_state.players[i].alive;
+                update.players[i].carrying = current_state.players[i].carrying;
                 update.players[i].team = current_state.players[i].team;
                 update.players[i].position = current_state.players[i].position;
                 update.players[i].velocity = current_state.players[i].velocity;
@@ -154,6 +162,8 @@ void scene_gameplay::tick(float delta) {
             update.projectiles[i].position = current_state.projectiles[i].position;
             update.projectiles[i].velocity = current_state.projectiles[i].velocity;
         }
+
+        update.objective.position = current_state.objective.position;
 
         for (auto i = 0u; i < current_state.players.size(); ++i) {
             auto& p = current_state.players[i];

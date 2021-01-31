@@ -102,7 +102,7 @@ auto game_client::get_state() -> const game_state& {
     return predicted_state;
 }
 
-void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir, const glm::vec2& direction) {
+void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir, const glm::vec2& direction, bool carrying) {
     if (context->connection && current_state.me) {
         auto msg = message::player_move{};
         msg.time = predicted_state.time;
@@ -113,10 +113,13 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
 
     predicted_state.time += delta * 60.0;
 
+    predicted_state.players[*current_state.me].carrying = carrying;//this is probably where a problem is, couldn't update state before in scene_gameplay though
+
     // physics
     for (auto& player : predicted_state.players) {
         if (player.present) {
-            player.position += player.velocity * delta;
+            player.position += player.velocity * delta * (player.carrying ? .5f : 1.0f);
+
             if(player.position.x > 59.5) {
                 player.position.x = 59.5;
             }
@@ -128,6 +131,10 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
             }
             if(player.position.y < 0.5) {
                 player.position.y = 0.5;
+            }
+
+            if(player.carrying) {
+                predicted_state.objective.position += player.velocity * delta * .5f;
             }
         }
     }
@@ -169,6 +176,7 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
                 if (m.players[i].present) {
                     current_state.players[i].present = true;
                     current_state.players[i].alive = m.players[i].alive;
+                    current_state.players[i].carrying = m.players[i].carrying;
                     current_state.players[i].team = m.players[i].team;
                     current_state.players[i].position = m.players[i].position;
                     current_state.players[i].velocity = m.players[i].velocity;
@@ -183,6 +191,7 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
                 current_state.projectiles[i].position = m.projectiles[i].position;
                 current_state.projectiles[i].velocity = m.projectiles[i].velocity;
             }
+            current_state.objective.position = m.objective.position;
             current_state.me = m.me;
             predicted_state = current_state;
         },

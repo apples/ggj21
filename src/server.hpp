@@ -20,6 +20,7 @@ struct player_info {
     glm::vec2 velocity = {0, 0};
     glm::vec2 direction = {0, 0};
     bool alive = true;
+    bool carrying = false;
     std::array<int, 2> kunaiIds = {{-1, -1}};
 };
 
@@ -33,10 +34,15 @@ struct kunai_info {
     float dist_travelled = 0.f;
 };
 
+struct objective_info {
+    glm::vec2 position = {30, 15};
+};
+
 struct game_state {
     int time = 0;
     std::array<player_info, 4> players;
     std::array<kunai_info, 8> projectiles;
+    objective_info objective;
 };
 
 struct lobby_player_info {

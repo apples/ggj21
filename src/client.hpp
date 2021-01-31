@@ -32,6 +32,7 @@ public:
 struct player_info {
     bool present = false;
     bool alive = true;
+    bool carrying = false;
     team_name team = team_name::BLACK;
     glm::vec2 position = {0, 0};
     glm::vec2 velocity = {0, 0};
@@ -46,11 +47,16 @@ struct kunai_info {
     glm::vec2 velocity = {0, 0};
 };
 
+struct objective_info {
+    glm::vec2 position = {0, 0};
+};
+
 struct game_state {
     double time = 0;
     std::array<player_info, 4> players;
     std::array<kunai_info, 8> projectiles;
     std::optional<int> me = std::nullopt;
+    objective_info objective;
 };
 
 struct lobby_player_info {
@@ -93,7 +99,7 @@ public:
 
     auto get_state() -> const game_state&;
 
-    void tick(float delta, const glm::vec2& input_dir, const glm::vec2& direction);
+    void tick(float delta, const glm::vec2& input_dir, const glm::vec2& direction, bool carrying);
 
     void fire(const glm::vec2& direction, team_name team);
 
