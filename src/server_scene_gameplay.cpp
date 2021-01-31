@@ -164,6 +164,7 @@ void scene_gameplay::tick(float delta) {
                     case kunai_state::FLYING: {
                         if (kunai.team != player.team && collides_with(kunai.position, 0.25, player.position, 0.5f)) {
                             player.alive = false;
+                            player.carrying = false;
                             std::cout << "Hit!" << std::endl;
                         }
                         break;
@@ -192,6 +193,21 @@ void scene_gameplay::tick(float delta) {
                     }
                 }
             }
+        }
+
+        // kunai <=> wall
+        if (kunai.state == kunai_state::FLYING) {
+            if(kunai.position.x < 0.25 ||
+                kunai.position.x > 59.75) {
+                    kunai.velocity = glm::vec2(-kunai.velocity.x, kunai.velocity.y);
+            }
+            if(kunai.position.y < 0.25 ||
+                kunai.position.y > 29.75) {
+                    kunai.velocity = glm::vec2(kunai.velocity.x, -kunai.velocity.y);
+            }
+                // kunai.state = kunai_state::ON_FLOOR;
+                // kunai.velocity = {0, 0};
+                // kunai.team = std::nullopt;
         }
     }
 
