@@ -19,16 +19,17 @@ struct player_info {
     glm::vec2 velocity = {0, 0};
     glm::vec2 direction = {0, 0};
     bool alive = true;
-    int kunaiAmount = 1;
+    std::array<int, 2> kunaiIds = {{-1, -1}};
 };
 
 struct kunai_info {
-    bool active = false;
+    kunai_state state = kunai_state::ON_FLOOR;
     team_name color = team_name::BLACK;
-    team_name team = team_name::BLACK;
+    std::optional<team_name> team = std::nullopt;
     glm::vec2 position = {0, 0};
     glm::vec2 velocity = {0, 0};
     glm::vec2 direction = {0, 0};
+    float dist_travelled = 0.f;
 };
 
 struct game_state {

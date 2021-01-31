@@ -35,15 +35,16 @@ struct game_state_update {
     };
 
     struct kunai_info {
-        bool active = false;
+        kunai_state state = kunai_state::ON_FLOOR;
         team_name color = team_name::BLACK;
-        team_name team = team_name::BLACK;
+        std::optional<team_name> team = std::nullopt;
         glm::vec2 position = {0, 0};
         glm::vec2 velocity = {0, 0};
 
         template <typename Archive>
         void serialize(Archive& archive) {
-            archive(active);
+            archive(state);
+            archive(color);
             archive(team);
             archive(position.x, position.y);
             archive(velocity.x, velocity.y);

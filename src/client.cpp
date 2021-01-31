@@ -121,7 +121,7 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
     }
 
     for (auto& kunai : predicted_state.projectiles) {
-        if (kunai.active) {
+        if (kunai.state == kunai_state::FLYING) {
             kunai.position += kunai.velocity * delta;
         }
     }
@@ -165,15 +165,11 @@ void game_client::on_receive(channel::state_updates, const connection_ptr& conn,
                 }
             }
             for (int i = 0; i < m.projectiles.size(); ++i) {
-                if (m.projectiles[i].active) {
-                    current_state.projectiles[i].active = true;
-                    current_state.projectiles[i].color = m.projectiles[i].color;
-                    current_state.projectiles[i].team = m.projectiles[i].team;
-                    current_state.projectiles[i].position = m.projectiles[i].position;
-                    current_state.projectiles[i].velocity = m.projectiles[i].velocity;
-                } else {
-                    current_state.projectiles[i].active = false;
-                }
+                current_state.projectiles[i].state = m.projectiles[i].state;
+                current_state.projectiles[i].color = m.projectiles[i].color;
+                current_state.projectiles[i].team = m.projectiles[i].team;
+                current_state.projectiles[i].position = m.projectiles[i].position;
+                current_state.projectiles[i].velocity = m.projectiles[i].velocity;
             }
             current_state.me = m.me;
             predicted_state = current_state;

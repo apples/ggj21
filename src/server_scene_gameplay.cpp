@@ -25,22 +25,66 @@ void scene_gameplay::tick(float delta) {
     }
 
     for (auto& kunai : current_state.projectiles) {
-        if (kunai.active) {
-            kunai.position += kunai.velocity * delta;
+        if (kunai.state == kunai_state::FLYING) {
+            auto adv = kunai.velocity * delta;
+            kunai.position += adv;
+            kunai.dist_travelled += glm::length(adv);
+
+            if (kunai.dist_travelled > 10.f) {
+                kunai.state = kunai_state::ON_FLOOR;
+            }
         }
     }
 
     //collision
-    for(auto& kunai : current_state.projectiles) {
-        for(auto& player : current_state.players) {
-            if(kunai.active && player.alive && kunai.team != player.team && player.conn &&
-                kunai.position.x + .125 > player.position.x - .5 &&
-                kunai.position.x - .125 < player.position.x + .5 &&
-                kunai.position.y + .25 > player.position.y - .5 &&
-                kunai.position.y - .25 < player.position.y + .5) {
-                    player.alive = false;
-                    std::cout << "Hit!" << std::endl;
+    auto collides_with = [](const auto& p1, float r1, const auto& p2, float r2) {
+        return glm::length(p1 - p2) <= (r1 + r2);
+    };
+
+    for(auto i = 0u; i < current_state.projectiles.size(); ++i) {
+        auto& kunai = current_state.projectiles[i];
+
+        if (kunai.state == kunai_state::FLYING) {
+            for(auto& kunai2 : current_state.projectiles) {
+                if (&kunai == &kunai2) continue;
+
+                if (kunai2.state == kunai_state::FLYING) {
+                    if (collides_with(kunai.position, 0.25f, kunai2.position, 0.25f)) {
+                        kunai.state = kunai_state::ON_FLOOR;
+                        kunai.velocity = {0, 0};
+                        kunai.team = std::nullopt;
+                        kunai2.state = kunai_state::ON_FLOOR;
+                        kunai2.velocity = {0, 0};
+                        kunai2.team = std::nullopt;
+                    }
                 }
+            }
+        }
+
+        for(auto& player : current_state.players) {
+            if (player.conn && player.alive) {
+                switch (kunai.state) {
+                    case kunai_state::FLYING: {
+                        if (kunai.team != player.team && collides_with(kunai.position, 0.25, player.position, 0.5f)) {
+                            player.alive = false;
+                            std::cout << "Hit!" << std::endl;
+                        }
+                        break;
+                    }
+                    case kunai_state::ON_FLOOR: {
+                        if (collides_with(kunai.position, 0.25, player.position, 0.5f)) {
+                            if (player.kunaiIds[0] == -1) {
+                                player.kunaiIds[0] = i;
+                                kunai.state = kunai_state::HELD;
+                            } else if (player.kunaiIds[1] == -1) {
+                                player.kunaiIds[1] = i;
+                                kunai.state = kunai_state::HELD;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -63,15 +107,11 @@ void scene_gameplay::tick(float delta) {
         }
 
         for (auto i = 0u; i < current_state.projectiles.size(); ++i) {
-            if (current_state.projectiles[i].active) {
-                update.projectiles[i].active = true;
-                update.projectiles[i].color = current_state.projectiles[i].color;
-                update.projectiles[i].team = current_state.projectiles[i].team;
-                update.projectiles[i].position = current_state.projectiles[i].position;
-                update.projectiles[i].velocity = current_state.projectiles[i].velocity;
-            } else {
-                update.projectiles[i].active = false;
-            }
+            update.projectiles[i].state = current_state.projectiles[i].state;
+            update.projectiles[i].color = current_state.projectiles[i].color;
+            update.projectiles[i].team = current_state.projectiles[i].team;
+            update.projectiles[i].position = current_state.projectiles[i].position;
+            update.projectiles[i].velocity = current_state.projectiles[i].velocity;
         }
 
         for (auto i = 0u; i < current_state.players.size(); ++i) {
@@ -147,15 +187,21 @@ void scene_gameplay::on_receive(channel::actions, const connection_ptr& conn, st
             std::visit(
                 ember::utility::overload{
                     [&](const message::player_fire& m) {
-                        std::cout << "Player fired kunai " << m.direction.x << ", " << m.direction.y << std::endl;
-                        auto newKunai = server::kunai_info{};
-                        newKunai.active = true;
-                        newKunai.team = m.team;
-                        newKunai.color = m.team;//temporary testing
-                        newKunai.direction = m.direction;
-                        newKunai.position = player.position;
-                        newKunai.velocity = m.direction * 20.0f;
-                        current_state.projectiles[0] = newKunai;
+                        auto id = std::exchange(player.kunaiIds[1], -1);
+
+                        if (id == -1) {
+                            id = std::exchange(player.kunaiIds[0], -1);
+                        }
+
+                        if (id != -1) {
+                            auto& newKunai = current_state.projectiles[id];
+                            newKunai.state = kunai_state::FLYING;
+                            newKunai.team = player.team;
+                            newKunai.direction = m.direction;
+                            newKunai.position = player.position;
+                            newKunai.velocity = m.direction * 20.0f;
+                            newKunai.dist_travelled = 0.f;
+                        }
                     },
                     [&](const auto&) {
                         std::cout << "Bad message from player " << conn->get_endpoint() << std::endl;
