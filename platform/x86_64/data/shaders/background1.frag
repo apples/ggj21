@@ -89,7 +89,7 @@ void main() {
 		return;
 	}
 
-	float scale = 0.1; // 8 is probably a good fit for the player view, map view probably closer to 12
+	float scale = 0.2; // 8 is probably a good fit for the player view, map view probably closer to 12
 	float timeScale = 1.0 / 600.0;
 
 	vec3 coord = vec3(worldCoord.xy * scale, Time * timeScale);
