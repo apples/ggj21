@@ -50,6 +50,10 @@ void scene_gameplay::tick(float delta) {
 
         if (mb_pressed & SDL_BUTTON_LMASK && state.players[*state.me].alive) {
             context.fire(direction, state.players[*state.me].team);
+            std::string filename = "Unspotted_KunaiThrow_0";
+            filename.append(std::to_string(rand() % 6));
+            filename.append(".wav");
+            renderer->play_sfx(filename, state.players[*state.me].position);
         }
 
         if(bool(keys[SDL_Scancode::SDL_SCANCODE_LSHIFT])) {
