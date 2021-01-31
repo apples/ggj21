@@ -51,6 +51,11 @@ void scene_gameplay::tick(float delta) {
         if (mb_pressed & SDL_BUTTON_LMASK && state.players[*state.me].alive) {
             context.fire(direction, state.players[*state.me].team);
         }
+
+        if(bool(keys[SDL_Scancode::SDL_SCANCODE_LSHIFT])) {
+            input_dir.x /= 2;
+            input_dir.y /= 2;
+        }
     }
 
     gui_state["score_black"] = state.score_black;
