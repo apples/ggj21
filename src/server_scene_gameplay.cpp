@@ -62,7 +62,7 @@ void scene_gameplay::tick(float delta) {
         }
 
         for(auto& player : current_state.players) {
-            if (player.conn) {
+            if (player.conn && player.alive) {
                 switch (kunai.state) {
                     case kunai_state::FLYING: {
                         if (kunai.team != player.team && collides_with(kunai.position, 0.25, player.position, 0.5f)) {
@@ -97,6 +97,7 @@ void scene_gameplay::tick(float delta) {
         for (auto i = 0u; i < 4; ++i) {
             if (current_state.players[i].conn) {
                 update.players[i].present = true;
+                update.players[i].alive = current_state.players[i].alive;
                 update.players[i].team = current_state.players[i].team;
                 update.players[i].position = current_state.players[i].position;
                 update.players[i].velocity = current_state.players[i].velocity;

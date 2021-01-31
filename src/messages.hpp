@@ -20,6 +20,8 @@ struct game_state_update {
         team_name team = team_name::BLACK;
         glm::vec2 position = {0, 0};
         glm::vec2 velocity = {0, 0};
+        bool alive = true;
+        int kunaiAmount = 1;
 
         template <typename Archive>
         void serialize(Archive& archive) {
@@ -27,6 +29,8 @@ struct game_state_update {
             archive(team);
             archive(position.x, position.y);
             archive(velocity.x, velocity.y);
+            archive(alive);
+            archive(kunaiAmount);
         }
     };
 

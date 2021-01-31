@@ -45,7 +45,7 @@ void scene_gameplay::tick(float delta) {
         direction = glm::normalize(
             glm::vec2{x - engine->display.width / 2, engine->display.height / 2 - y});
 
-        if (mb_pressed & SDL_BUTTON_LMASK) {
+        if (mb_pressed & SDL_BUTTON_LMASK && state.players[*state.me].alive) {
             context.fire(direction, state.players[*state.me].team);
         }
     }
@@ -69,7 +69,7 @@ void scene_gameplay::render() {
 
     for (int i = 0; i < state.players.size(); ++i) {
         auto& p = state.players[i];
-        if (p.present) {
+        if (p.present && p.alive) {
             renderer->draw_sprite("ninji", p.position, me && me->team == p.team, p.team == team_name::WHITE);
         }
     }
