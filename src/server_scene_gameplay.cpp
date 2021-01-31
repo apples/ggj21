@@ -11,6 +11,23 @@ scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls)
     for (auto i = 0u; i < ls->players.size(); ++i) {
         current_state.players[i].conn = ls->players[i].conn;
         current_state.players[i].team = ls->players[i].team;
+
+        switch(i) {
+            case 0u:
+                current_state.players[i].position = glm::vec2(22, 2);
+                break;
+            case 1u:
+                current_state.players[i].position = glm::vec2(22, 38);
+                break;
+            case 2u:
+                current_state.players[i].position = glm::vec2(27, 2);
+                break;
+            case 3u:
+                current_state.players[i].position = glm::vec2(27, 38);
+                break;
+            default:
+                current_state.players[i].position = glm::vec2(0, 0);
+        }
     }
 
     auto wsx_dist = std::uniform_real_distribution{10.f, world_size.x - 10.f};
