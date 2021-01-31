@@ -79,7 +79,8 @@ void scene_gameplay::render() {
     for (int i = 0; i < state.projectiles.size(); ++i) {
         auto& p = state.projectiles[i];
         if (p.state == kunai_state::FLYING || p.state == kunai_state::ON_FLOOR) {
-            renderer->draw_sprite("BasicKunaiW", p.position, false, p.color == team_name::WHITE);
+            renderer->draw_sprite(
+                "BasicKunaiW", p.position, p.velocity, false, p.color == team_name::WHITE);
         }
     }
 
