@@ -24,7 +24,7 @@ public:
 
     void draw_sprite(const std::string& name, const glm::vec2& pos, bool my_team, bool white);
 
-    void draw_sprite(const std::string& name, const glm::vec2& pos, const glm::vec2& facing, bool my_team, bool white);
+    void draw_sprite(const std::string& name, const glm::vec2& pos, const glm::vec2& facing, const glm::vec2& scale, bool my_team, bool white);
 
     void finish();
 

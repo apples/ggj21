@@ -18,7 +18,8 @@ scene_gameplay::scene_gameplay(
       context(context, *lobby),
       gui_state{engine.lua.create_table()},
       world_size(world_size),
-      last_mb(0) {}
+      last_mb(0),
+      anim_timer(0.f) {}
 
 void scene_gameplay::init() {}
 
@@ -56,6 +57,8 @@ void scene_gameplay::tick(float delta) {
     gui_state["score_white"] = state.score_white;
 
     context.tick(delta, input_dir, direction);
+
+    anim_timer += delta;
 }
 
 void scene_gameplay::render() {
@@ -72,10 +75,14 @@ void scene_gameplay::render() {
 
     renderer->draw_background(state.time, world_size);
 
+    auto anim_frame = int(anim_timer * 6.f);
+
     for (int i = 0; i < state.players.size(); ++i) {
         auto& p = state.players[i];
         if (p.present && p.alive) {
-            renderer->draw_sprite("ninji", p.position, me && me->team == p.team, p.team == team_name::WHITE);
+            auto sprite_name = glm::length(p.velocity) > 0.1 ? std::string("ninji_walk000") + std::to_string(anim_frame % 4 + 1) : "ninji";
+            auto sprite_scale = p.velocity.x > 0.f ? glm::vec2{1, 1} : glm::vec2{-1, 1};
+            renderer->draw_sprite(sprite_name, p.position, {0.f, 0.f}, sprite_scale, me && me->team == p.team, p.team == team_name::WHITE);
         }
     }
 
@@ -83,7 +90,7 @@ void scene_gameplay::render() {
         auto& p = state.projectiles[i];
         if (p.state == kunai_state::FLYING || p.state == kunai_state::ON_FLOOR) {
             renderer->draw_sprite(
-                "BasicKunaiW", p.position, p.velocity, false, p.color == team_name::WHITE);
+                "BasicKunaiW", p.position, p.velocity, {1.f, 0.5f}, false, p.color == team_name::WHITE);
         }
     }
 
