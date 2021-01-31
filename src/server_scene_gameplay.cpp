@@ -71,6 +71,31 @@ void scene_gameplay::tick(float delta) {
             if(player.carrying) {
                 current_state.objective.position = player.position;
             }
+
+            //respawn
+            if(!player.alive) {
+                player.respawnTimer += delta;
+                if(player.respawnTimer > 5.0f) {
+                    player.alive = true;
+                    player.respawnTimer = 0;
+                    switch(std::distance(&current_state.players[0], &player)) {
+                        case 0:
+                            player.position = glm::vec2(2, 13);
+                            break;
+                        case 1:
+                            player.position = glm::vec2(58, 13);
+                            break;
+                        case 2:
+                            player.position = glm::vec2(2, 17);
+                            break;
+                        case 3:
+                            player.position = glm::vec2(58, 17);
+                            break;
+                        default:
+                            player.position = glm::vec2(0, 0);
+                    }
+                }
+            }
         }
     }
 

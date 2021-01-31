@@ -37,6 +37,7 @@ struct player_info {
     glm::vec2 position = {0, 0};
     glm::vec2 velocity = {0, 0};
     glm::vec2 direction = {0, 0};
+    float respawnTimer = 0.0f;
 };
 
 struct kunai_info {

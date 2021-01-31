@@ -21,6 +21,7 @@ struct player_info {
     glm::vec2 direction = {0, 0};
     bool alive = true;
     bool carrying = false;
+    float respawnTimer = 0.0f;
     std::array<int, 2> kunaiIds = {{-1, -1}};
 };
 

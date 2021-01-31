@@ -23,6 +23,7 @@ struct game_state_update {
         bool alive = true;
         bool carrying = false;
         int kunaiAmount = 1;
+        float respawnTimer = 0.0f;
 
         template <typename Archive>
         void serialize(Archive& archive) {
@@ -33,6 +34,7 @@ struct game_state_update {
             archive(alive);
             archive(carrying);
             archive(kunaiAmount);
+            archive(respawnTimer);
         }
     };
 
