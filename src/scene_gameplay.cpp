@@ -67,12 +67,12 @@ void scene_gameplay::tick(float delta) {
             input_dir.y /= 2;
         }
 
-        if(glm::length(input_dir) > .55f && int(anim_timer * 6) % 4 == 0) {
-            std::string filename = "GrassStep_0";
-            filename.append(std::to_string(rand() % 9));
-            filename.append(".ogg");
-            renderer->play_sfx(filename, state.players[*state.me].position);
-        }
+        // if(glm::length(input_dir) > .55f && int(anim_timer * 6) % 4 == 0) {
+        //     std::string filename = "GrassStep_0";
+        //     filename.append(std::to_string(rand() % 9));
+        //     filename.append(".ogg");
+        //     renderer->play_sfx(filename, state.players[*state.me].position);
+        // }
     }
 
     gui_state["score_black"] = state.score_black;
@@ -128,7 +128,7 @@ void scene_gameplay::render() {
         }
     }
 
-    renderer->draw_sprite("bagua", state.objective.position, true, true);
+    renderer->draw_sprite("bagua2", state.objective.position, true, true);
     renderer->draw_sprite("pedestal", state.objective.goal_black, true, true);
     renderer->draw_sprite("pedestal", state.objective.goal_white, true, true);
 

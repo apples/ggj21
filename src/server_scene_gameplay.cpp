@@ -55,16 +55,16 @@ void scene_gameplay::tick(float delta) {
         if (player.conn) {
             player.position += player.velocity * delta * (player.carrying ? .5f : 1.0f);
 
-            if (glm::length(player.direction) > .55f && int(current_state.time / 10) % 4 == 0) {
-                std::string filename = "GrassStep_0";
-                filename.append(std::to_string(rand() % 9));
-                filename.append(".ogg");
-                for (auto& p : current_state.players) {
-                    if (p.conn && p.conn != player.conn) {
-                        send_message<channel::actions>(p.conn, message::play_sfx{filename, player.position});
-                    }
-                }
-            }
+            // if (glm::length(player.direction) > .55f && int(current_state.time / 10) % 4 == 0) {
+            //     std::string filename = "GrassStep_0";
+            //     filename.append(std::to_string(rand() % 9));
+            //     filename.append(".ogg");
+            //     for (auto& p : current_state.players) {
+            //         if (p.conn && p.conn != player.conn) {
+            //             send_message<channel::actions>(p.conn, message::play_sfx{filename, player.position});
+            //         }
+            //     }
+            // }
 
             if(player.position.x > 59.5) {
                 player.position.x = 59.5;
@@ -165,6 +165,7 @@ void scene_gameplay::tick(float delta) {
                         if (kunai.team != player.team && collides_with(kunai.position, 0.25, player.position, 0.5f)) {
                             player.alive = false;
                             player.carrying = false;
+                            current_state.objective.carried = false;
                             std::cout << "Hit!" << std::endl;
                         }
                         break;
