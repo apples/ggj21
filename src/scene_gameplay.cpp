@@ -52,13 +52,21 @@ void scene_gameplay::tick(float delta) {
             context.fire(direction, state.players[*state.me].team);
             std::string filename = "Unspotted_KunaiThrow_0";
             filename.append(std::to_string(rand() % 6));
-            filename.append(".wav");
+            filename.append(".ogg");
             renderer->play_sfx(filename, state.players[*state.me].position);
         }
 
         if(bool(keys[SDL_Scancode::SDL_SCANCODE_LSHIFT])) {
             input_dir.x /= 2;
             input_dir.y /= 2;
+        }
+
+        if(abs(input_dir.x) > .5 || abs(input_dir.y) > .5 &&
+            int(anim_timer * 6) % 4 == 0) {
+                std::string filename = "Unspotted_GrassStep_0";
+                filename.append(std::to_string(rand() % 9));
+                filename.append(".ogg");
+                renderer->play_sfx(filename, state.players[*state.me].position);
         }
     }
 

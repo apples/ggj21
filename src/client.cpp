@@ -134,29 +134,6 @@ void game_client::tick([[maybe_unused]] float delta, const glm::vec2& input_dir,
             if (player.carrying) {
                 predicted_state.objective.position = player.position;
             }
-
-            // if(!player.alive) {
-            //     player.respawnTimer += delta;
-            //     if(player.respawnTimer > 3.0f) {
-            //         player.alive = true;
-            //         player.respawnTimer = 0;
-            //         switch(i) {
-            //             case 0u:
-            //                 current_state.players[i].position = glm::vec2(2, 13);
-            //                 break;
-            //             case 1u:
-            //                 current_state.players[i].position = glm::vec2(58, 13);
-            //                 break;
-            //             case 2u:
-            //                 current_state.players[i].position = glm::vec2(2, 17);
-            //                 break;
-            //             case 3u:
-            //                 current_state.players[i].position = glm::vec2(58, 17);
-            //                 break;
-            //             default:
-            //                 current_state.players[i].position = glm::vec2(0, 0);
-            //     }
-            // }
         }
     }
 
