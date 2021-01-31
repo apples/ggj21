@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <array>
+#include <random>
 
 namespace server {
 
@@ -130,6 +131,8 @@ public:
 
 private:
     game_state current_state;
+    glm::vec2 world_size;
+    std::mt19937 rng;
 };
 
 template <typename T, typename... Args, typename>

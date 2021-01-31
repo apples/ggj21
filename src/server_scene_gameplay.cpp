@@ -6,10 +6,22 @@
 
 namespace server {
 
-scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls) : game_server_scene(server) {
+scene_gameplay::scene_gameplay(game_server& server, const lobby_state* ls)
+    : game_server_scene(server), world_size{50, 50}, rng(std::random_device{}()) {
     for (auto i = 0u; i < ls->players.size(); ++i) {
         current_state.players[i].conn = ls->players[i].conn;
         current_state.players[i].team = ls->players[i].team;
+    }
+
+    auto wsx_dist = std::uniform_real_distribution{10.f, world_size.x - 10.f};
+    auto wsy_dist = std::uniform_real_distribution{10.f, world_size.y - 10.f};
+
+    bool w = false;
+
+    for (auto& k : current_state.projectiles) {
+        k.position = {wsx_dist(rng), wsy_dist(rng)};
+        k.color = w ? team_name::WHITE : team_name::BLACK;
+        w = !w;
     }
 }
 
