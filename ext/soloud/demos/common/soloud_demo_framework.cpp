@@ -29,16 +29,21 @@
 #if defined(_MSC_VER)
 #include "SDL.h"
 #include <windows.h>
-#else
-#include "SDL2/SDL.h"
-#endif
-#ifndef __EMSCRIPTEN__
 #include "GL/glew.h"
-#endif
-
+#else
 #ifdef __EMSCRIPTEN__
 #include "emscripten.h"
+#include <SDL2/SDL.h>
 #include <GLES2/gl2.h>
+#else
+#include <SDL2/SDL.h>
+#include "GL/glew.h"
+#include <GL/gl.h>
+#endif
+#endif
+
+
+#if !defined(_MSC_VER) && !defined(__EMSCRIPTEN__)
 #endif
 
 #include <math.h>
@@ -54,7 +59,7 @@ int gMouseY = 0;
 SDL_Window *gSDLWindow;
 GLuint desktop_tex;
 
-unsigned int DemoLoadTexture(char * aFilename)
+unsigned int DemoLoadTexture(const char * aFilename)
 {
 	int x, y, comp;
 	unsigned char *image = stbi_load(aFilename, &x, &y, &comp, 4);
@@ -93,7 +98,7 @@ GLuint loadShader(GLenum aShaderType, const char* aSource)
 				if (buf)
 				{
 					glGetShaderInfoLog(shader, infoLen, NULL, buf);
-					printf("Could not compile shader %d:\n%s\n", aShaderType, buf);
+					printf("Could not compile shader %d:\n%s\n", (int)aShaderType, buf);
 					free(buf);
 				}
 				glDeleteShader(shader);
@@ -510,6 +515,7 @@ void InitImGui()
 	gUIState.mousex = gUIState.mousey = gUIState.mousedown = gUIState.scroll = 0;
 	memset(gUIState.textinput, 0, sizeof(gUIState.textinput));
 
+	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.DeltaTime = 1.0f / 60.0f;                     
 	io.KeyMap[ImGuiKey_Tab] = SDLK_TAB;
