@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 #include "channels.hpp"
+#include "messages.hpp"
 
 #include <trellis/trellis.hpp>
 #include <glm/glm.hpp>
@@ -60,7 +61,7 @@ struct lobby_player_info {
 struct lobby_state {
     std::optional<int> me = std::nullopt;
     std::array<lobby_player_info, 4> players;
-    bool game_starting = false;
+    std::optional<message::game_started> game_start = std::nullopt;
 };
 
 class lobby_client {
@@ -71,7 +72,7 @@ public:
 
     auto get_context() -> const std::shared_ptr<game_client_context>&;
 
-    [[nodiscard]] bool tick(float delta);
+    [[nodiscard]] auto tick(float delta) -> std::optional<message::game_started>;
 
     void start_game();
 

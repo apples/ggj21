@@ -36,14 +36,14 @@ auto lobby_client::get_context() -> const std::shared_ptr<game_client_context>& 
     return context;
 }
 
-bool lobby_client::tick([[maybe_unused]] float delta) {
+auto lobby_client::tick([[maybe_unused]] float delta) -> std::optional<message::game_started> {
     context->context.poll_events(*this);
 
-    return current_state.game_starting;
+    return current_state.game_start;
 }
 
 void lobby_client::start_game() {
-    send_message<channel::actions>(context->connection, message::lobby_start{});
+    send_message<channel::actions>(context->connection, message::lobby_start_game{});
 }
 
 void lobby_client::on_connect(const connection_ptr& conn) {
@@ -78,8 +78,8 @@ void lobby_client::on_receive(channel::actions, const connection_ptr& conn, std:
     auto msg = receive_message(data);
 
     std::visit(ember::utility::overload {
-        [&](const message::lobby_start& m) {
-            current_state.game_starting = true;
+        [&](const message::game_started& m) {
+            current_state.game_start = m;
         },
         [&](const auto&) {
             std::cout << "Bad message from server " << conn->get_endpoint() << std::endl;

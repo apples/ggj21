@@ -24,7 +24,7 @@ void scene_lobby::tick(float delta) {
     auto starting = context.tick(delta);
 
     if (starting) {
-        engine->queue_transition<scene_gameplay>(false, &context.get_state(), server_handle, renderer, context.get_context());
+        engine->queue_transition<scene_gameplay>(false, &context.get_state(), server_handle, renderer, context.get_context(), starting->world_size);
     }
 }
 

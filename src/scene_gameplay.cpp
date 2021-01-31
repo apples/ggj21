@@ -10,12 +10,14 @@ scene_gameplay::scene_gameplay(
     const client::lobby_state* lobby,
     std::shared_ptr<void> server_handle,
     std::shared_ptr<game_renderer> renderer,
-    std::shared_ptr<client::game_client_context> context)
+    std::shared_ptr<client::game_client_context> context,
+    const glm::vec2& world_size)
     : scene(engine),
       server_handle(server_handle),
       renderer(renderer),
       context(context, *lobby),
       gui_state{engine.lua.create_table()},
+      world_size(world_size),
       last_mb(0) {}
 
 void scene_gameplay::init() {}
@@ -65,7 +67,7 @@ void scene_gameplay::render() {
 
     renderer->begin();
 
-    renderer->draw_background(state.time, {50, 40});
+    renderer->draw_background(state.time, world_size);
 
     for (int i = 0; i < state.players.size(); ++i) {
         auto& p = state.players[i];

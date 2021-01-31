@@ -117,9 +117,18 @@ struct lobby_flip_color {
     void serialize(Archive& archive) {}
 };
 
-struct lobby_start {
+struct lobby_start_game {
     template <typename Archive>
     void serialize(Archive& archive) {}
+};
+
+struct game_started {
+    glm::vec2 world_size = {0, 0};
+
+    template <typename Archive>
+    void serialize(Archive& archive) {
+        archive(world_size.x, world_size.y);
+    }
 };
 
 using any = std::variant<
@@ -128,7 +137,8 @@ using any = std::variant<
     lobby_state_update,
     player_fire,
     lobby_flip_color,
-    lobby_start>;
+    lobby_start_game,
+    game_started>;
 
 } // namespace message
 
