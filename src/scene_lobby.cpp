@@ -18,7 +18,9 @@ scene_lobby::scene_lobby(
       context(context),
       gui_state{engine.lua.create_table()} {}
 
-void scene_lobby::init() {}
+void scene_lobby::init() {
+    renderer->play_bgm("UNS, Ronin (mperezsounds).ogg");
+}
 
 void scene_lobby::tick(float delta) {
     auto starting = context.tick(delta);
