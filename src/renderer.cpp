@@ -110,28 +110,16 @@ void game_renderer::finish() {}
 
 void game_renderer::update_3d_audio(const glm::vec2& pos) {
     soloud.set3dListenerPosition(pos.x, pos.y, 0.f);
-    soloud.set3dListenerUp(0.f, 1.f, 0.f);
+    soloud.set3dListenerUp(0.f, 0.f, 1.f);
     soloud.update3dAudio();
 }
 
 void game_renderer::play_sfx(const std::string& name) {
-    auto iter = sfx.find(name);
-    if (iter == sfx.end()) {
-        iter = sfx.emplace(name, std::make_unique<SoLoud::Wav>()).first;
-        iter->second->load(("data/sounds/" + name).c_str());
-    }
-
-    soloud.play(*iter->second);
+    soloud.play(load_sfx(name));
 }
 
 void game_renderer::play_sfx(const std::string& name, const glm::vec2& pos) {
-    auto iter = sfx.find(name);
-    if (iter == sfx.end()) {
-        iter = sfx.emplace(name, std::make_unique<SoLoud::Wav>()).first;
-        iter->second->load(("data/sounds/" + name).c_str());
-    }
-
-    soloud.play3d(*iter->second, pos.x, pos.y, 0.f);
+    soloud.play3d(load_sfx(name), pos.x, pos.y, 0.f);
 }
 
 void game_renderer::play_bgm(const std::string& name) {
@@ -148,4 +136,16 @@ void game_renderer::play_bgm(const std::string& name) {
 
     bgm_handle = soloud.playBackground(iter->second);
     soloud.setVolume(*bgm_handle, 0.5);
+}
+
+auto game_renderer::load_sfx(const std::string& name) -> SoLoud::Wav& {
+    auto iter = sfx.find(name);
+    if (iter == sfx.end()) {
+        iter = sfx.emplace(name, std::make_unique<SoLoud::Wav>()).first;
+        iter->second->load(("data/sounds/" + name).c_str());
+        iter->second->set3dMinMaxDistance(1.f, 10.f);
+        iter->second->set3dAttenuation(SoLoud::AudioSource::INVERSE_DISTANCE, 11.f);
+    }
+
+    return *iter->second;
 }

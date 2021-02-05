@@ -55,16 +55,19 @@ void scene_gameplay::tick(float delta) {
         if (player.conn) {
             player.position += player.velocity * delta * (player.carrying ? .5f : 1.0f);
 
-            // if (glm::length(player.direction) > .55f && int(current_state.time / 10) % 4 == 0) {
-            //     std::string filename = "GrassStep_0";
-            //     filename.append(std::to_string(rand() % 9));
-            //     filename.append(".ogg");
-            //     for (auto& p : current_state.players) {
-            //         if (p.conn && p.conn != player.conn) {
-            //             send_message<channel::actions>(p.conn, message::play_sfx{filename, player.position});
-            //         }
-            //     }
-            // }
+            // footsteps
+
+            auto footstep_timer = current_state.time / 10;
+
+            if (footstep_timer != player.last_footstep && footstep_timer % 4 == 0 && glm::length(player.direction) > .55f) {
+                player.last_footstep = footstep_timer;
+                auto filename = "GrassStep_0" + std::to_string(rand() % 9) + ".ogg";
+                for (auto& p : current_state.players) {
+                    if (p.conn) {
+                        send_message<channel::actions>(p.conn, message::play_sfx{filename, player.position});
+                    }
+                }
+            }
 
             if(player.position.x > 59.5) {
                 player.position.x = 59.5;

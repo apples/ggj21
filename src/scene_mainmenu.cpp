@@ -29,7 +29,7 @@ auto scene_mainmenu::render_gui() -> sol::table {
 
 void scene_mainmenu::start_game() {
     auto renderer = std::make_shared<game_renderer>(engine->display);
-    auto server = std::make_shared<server::game_server>(*engine->io, 6969);
+    auto server = std::make_shared<server::game_server>(*engine->io, 6970);
     server->start();
     std::cout << "Server started: " << server->get_endpoint() << std::endl;
     auto server_addr = asio::ip::udp::endpoint{asio::ip::make_address_v6("::1"), server->get_endpoint().port()};
@@ -41,7 +41,7 @@ void scene_mainmenu::start_game() {
 void scene_mainmenu::join_game(const std::string& addr_str) {
     auto renderer = std::make_shared<game_renderer>(engine->display);
     auto addr = asio::ip::make_address_v6(addr_str);
-    auto server_endpoint = asio::ip::udp::endpoint{addr, 6969};
+    auto server_endpoint = asio::ip::udp::endpoint{addr, 6970};
     auto context = std::make_shared<client::game_client_context>(*engine->io, server_endpoint);
     context->start();
     engine->queue_transition<scene_lobby>(false, nullptr, renderer, context);

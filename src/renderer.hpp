@@ -39,11 +39,13 @@ public:
     void play_bgm(const std::string& name);
 
 private:
+    auto load_sfx(const std::string& name) -> SoLoud::Wav&;
+
     sprite_shader_program sprite_shader;
     background_shader_program background_shader;
     sushi::mesh_group sprite_mesh;
     std::unordered_map<std::string, sushi::texture_2d> sprite_textures;
-    
+
     SoLoud::Soloud soloud;
     std::unordered_map<std::string, std::unique_ptr<SoLoud::Wav>> sfx;
     std::unordered_map<std::string, SoLoud::WavStream> bgm;

@@ -1,21 +1,24 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required(VERSION 3.12)
 project(SoLoud)
 
 file(GLOB_RECURSE soloud_SOURCES src/audiosource/* src/filter/* src/core/*)
-file(GLOB_RECURSE soloud_PLATFORM_SOURCES src/backend/sdl2_static/*)
+file(GLOB_RECURSE soloud_PLATFORM_SOURCES src/backend/sdl/soloud_sdl2*)
 
 add_library(soloud ${soloud_SOURCES} ${soloud_PLATFORM_SOURCES})
 target_include_directories(soloud PUBLIC include)
-target_compile_definitions(soloud PUBLIC "WITH_SDL2_STATIC")
 
 if (EMSCRIPTEN)
+    target_compile_definitions(soloud PRIVATE "WITH_SDL2_STATIC")
     set_target_properties(soloud PROPERTIES
         COMPILE_FLAGS "-s USE_SDL=2"
         LINK_FLAGS "-s USE_SDL=2")
 else()
-    find_package(PkgConfig REQUIRED)
-    pkg_search_module(SDL2 REQUIRED sdl2)
+    target_compile_definitions(soloud PRIVATE "WITH_SDL2")
 
-    target_link_libraries(soloud ${SDL2_LIBRARIES})
-    target_include_directories(soloud PUBLIC ${SDL2_INCLUDE_DIRS})
+    if(WIN32)
+        target_compile_definitions(soloud PRIVATE "WINDOWS_VERSION")
+    endif()
+
+    find_package(SDL2 REQUIRED)
+    target_link_libraries(soloud SDL2::SDL2)
 endif()

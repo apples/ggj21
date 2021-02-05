@@ -13,11 +13,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(ExternalProject)
 
 set(SKIP_INSTALL_ALL Yes)
-set(FT_WITH_ZLIB Off)
-set(FT_WITH_BZIP2 Off)
-set(FT_WITH_PNG Off)
-set(FT_WITH_HARFBUZZ Off)
-set(FT_WITH_BROTLI Off)
+option(FT_WITH_ZLIB Off)
+option(FT_WITH_BZIP2 Off)
+option(FT_WITH_PNG Off)
+option(FT_WITH_HARFBUZZ Off)
+option(FT_WITH_BROTLI Off)
+set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB TRUE)
+set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 TRUE)
+set(CMAKE_DISABLE_FIND_PACKAGE_PNG TRUE)
+set(CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz TRUE)
+set(CMAKE_DISABLE_FIND_PACKAGE_BrotliDec TRUE)
 
 add_subdirectory(ext/freetype2)
 add_subdirectory(ext/ginseng)
@@ -81,7 +86,7 @@ target_link_libraries(ggj21
     msdfgen
     soloud
     box2d
-    SDL2::SDL2-static
+    SDL2::SDL2
     freetype)
 add_dependencies(ggj21 ember_data ember_platform_data)
 

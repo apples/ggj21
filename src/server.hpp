@@ -23,6 +23,7 @@ struct player_info {
     bool carrying = false;
     float respawnTimer = 0.0f;
     std::array<int, 2> kunaiIds = {{-1, -1}};
+    int last_footstep = -1;
 };
 
 struct kunai_info {
