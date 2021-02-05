@@ -1,5 +1,7 @@
 #include "scene_mainmenu.hpp"
 
+#include "renderer.hpp"
+
 #include "ember/engine.hpp"
 #include "ember/config.hpp"
 
@@ -47,8 +49,10 @@ int main(int argc, char* argv[]) try {
     });
 
     auto engine = std::make_unique<ember::engine>(io, config);
+    
+    auto renderer = std::make_shared<game_renderer>(engine->display);
 
-    engine->queue_transition<scene_mainmenu>(false);
+    engine->queue_transition<scene_mainmenu>(false, renderer, 6969);
 
     std::cout << "Success." << std::endl;
     

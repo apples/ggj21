@@ -7,8 +7,9 @@
 #include "ember/engine.hpp"
 #include "ember/vdom.hpp"
 
-scene_mainmenu::scene_mainmenu(ember::engine& engine, ember::scene* prev)
-    : scene(engine), gui_state{engine.lua.create_table()} {
+scene_mainmenu::scene_mainmenu(
+    ember::engine& engine, ember::scene* prev, std::shared_ptr<game_renderer> renderer, std::uint16_t server_port)
+    : scene(engine), gui_state{engine.lua.create_table()}, renderer(renderer), server_port(server_port) {
     gui_state["start_game"] = [this]{ start_game(); };
     gui_state["join_game"] = [this](const std::string& addr){ join_game(addr); };
 }
@@ -28,8 +29,7 @@ auto scene_mainmenu::render_gui() -> sol::table {
 }
 
 void scene_mainmenu::start_game() {
-    auto renderer = std::make_shared<game_renderer>(engine->display);
-    auto server = std::make_shared<server::game_server>(*engine->io, 6970);
+    auto server = std::make_shared<server::game_server>(*engine->io, server_port);
     server->start();
     std::cout << "Server started: " << server->get_endpoint() << std::endl;
     auto server_addr = asio::ip::udp::endpoint{asio::ip::make_address_v6("::1"), server->get_endpoint().port()};
@@ -39,9 +39,8 @@ void scene_mainmenu::start_game() {
 }
 
 void scene_mainmenu::join_game(const std::string& addr_str) {
-    auto renderer = std::make_shared<game_renderer>(engine->display);
     auto addr = asio::ip::make_address_v6(addr_str);
-    auto server_endpoint = asio::ip::udp::endpoint{addr, 6970};
+    auto server_endpoint = asio::ip::udp::endpoint{addr, server_port};
     auto context = std::make_shared<client::game_client_context>(*engine->io, server_endpoint);
     context->start();
     engine->queue_transition<scene_lobby>(false, nullptr, renderer, context);
